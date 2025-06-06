@@ -11,7 +11,11 @@ const prisma = new PrismaClient();
 const admissionSchema = z.object({
   admissionDate: z.coerce.date(),
   admissionTime: z.string().min(1, "Admission time is required"),
-  dischargeDate: z.coerce.date().optional(),
+ dischargeDate: z.preprocess(
+  (val) => (val === "" ? undefined : val),
+  z.coerce.date().optional()
+),
+
   gsRsRegNo: z.string().min(1, "GS/RS Reg No is required"),
   wardNo: z.string().min(1, "Ward No is required"),
   bedNo: z.string().min(1, "Bed No is required"),
@@ -25,8 +29,8 @@ const admissionSchema = z.object({
   guardianName: z.string().min(1, "Guardian name is required"),
   phoneNo: z.string().min(10, "Phone number must be at least 10 digits"),
   patientAddress: z.string().min(1, "Address is required"),
-  bodyWeightKg: z.number().positive("Weight must be positive"),
-  bodyHeightCm: z.number().positive("Height must be positive"),
+  bodyWeightKg: z.number().optional(),
+  bodyHeightCm: z.number().optional(),
   literacy: z.string().min(1, "Literacy status is required"),
   occupation: z.string().min(1, "Occupation is required"),
   doctorName: z.string().min(1, "Doctor name is required"),
