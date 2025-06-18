@@ -12,7 +12,7 @@ const statusCodes_1 = require("../constants/statusCodes");
 const authService_1 = require("../services/authService");
 const schemas_1 = require("@hospital/schemas");
 const validateWithZod_1 = require("../utils/validateWithZod");
-const cookie_ts_1 = require("../utils/cookie.ts");
+const cookie_1 = require("../utils/cookie");
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "60d";
 // 🔐 Register
@@ -46,7 +46,7 @@ exports.login = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) =>
     if (!isPasswordValid) {
         return next(new errorHandler_1.ErrorHandler("Invalid Email or Password", statusCodes_1.StatusCodes.UNAUTHORIZED));
     }
-    (0, cookie_ts_1.sendCookie)({
+    (0, cookie_1.sendCookie)({
         id: user.id,
         name: user.name,
         email: user.email,

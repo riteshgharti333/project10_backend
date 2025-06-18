@@ -8,7 +8,7 @@ import { StatusCodes } from "../constants/statusCodes";
 import { createUser, getUserByEmail } from "../services/authService";
 import { authSchema } from "@hospital/schemas";
 import { validateWithZod } from "../utils/validateWithZod";
-import { sendCookie } from "../utils/cookie.ts";
+import { sendCookie } from "../utils/cookie";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "60d";
