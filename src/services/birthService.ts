@@ -2,7 +2,20 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createBirth = async (data: any) => {
+export type BirthInput = {
+  birthTime: string;
+  birthDate: Date;
+  babySex: string;
+  babyWeightKg: number;
+  fathersName: string;
+  mothersName: string;
+  mobileNumber: string;
+  deliveryType: string;
+  placeOfBirth: string;
+  attendantsName: string;
+};
+
+export const createBirth = async (data: BirthInput) => {
   return prisma.birth.create({ data });
 };
 
@@ -14,7 +27,7 @@ export const getBirthById = async (id: number) => {
   return prisma.birth.findUnique({ where: { id } });
 };
 
-export const updateBirth = async (id: number, data: any) => {
+export const updateBirth = async (id: number, data: Partial<BirthInput>) => {
   return prisma.birth.update({
     where: { id },
     data,

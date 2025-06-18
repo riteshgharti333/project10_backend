@@ -1,5 +1,4 @@
 import express from "express";
-import multer from "multer";
 import {
   createEmployeeRecord,
   getAllEmployeeRecords,
@@ -8,16 +7,15 @@ import {
   deleteEmployeeRecord,
 } from "../../controllers/transection/EmployeeController";
 
-const upload = multer({ dest: 'uploads/' });
 const router = express.Router();
 
 router.route("/")
-  .post(upload.single('photo'), createEmployeeRecord)
+  .post(createEmployeeRecord)
   .get(getAllEmployeeRecords);
 
 router.route("/:id")
   .get(getEmployeeRecordById)
-  .patch(upload.single('photo'), updateEmployeeRecord)
+  .patch(updateEmployeeRecord)
   .delete(deleteEmployeeRecord);
 
 export default router;

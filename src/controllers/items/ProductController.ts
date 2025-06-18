@@ -14,18 +14,8 @@ import {
   deleteProduct,
 } from "../../services/itemService/productService";
 
-const productSchema = z.object({
-  productName: z.string().min(1, "Product name is required"),
-  productCode: z.string().min(1, "Product code is required"),
-  parentCategory: z.string().min(1, "Parent category is required"),
-  subCategory: z.string().min(1, "Sub category is required"),
-  categoryLogo: z.string().optional(),
-  description: z.string().optional(),
-  unit: z.string().min(1, "Unit is required"),
-  price: z.number().min(0, "Price must be positive"),
-  taxRate: z.number().min(0, "Tax rate must be positive"),
-  status: z.string().optional().default("Active"),
-});
+import {productSchema} from "@hospital/schemas"
+
 
 export const createProductRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

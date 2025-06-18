@@ -2,55 +2,112 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createPharmacist = async (data: {
-  fullName: string;
-  mobileNumber: string;
-  registrationNo: string;
-  address: string;
-  department: string;
+type MedicineInput = {
+  medicineName: string;
+  description: string;
+};
+
+type PrescriptionInput = {
+  prescriptionDate: Date;
+  doctorId: number;
+  patientId: number;
+  prescriptionDoc?: string;
   status?: string;
-}) => {
-  return prisma.pharmacist.create({ data });
+  medicines: MedicineInput[];
 };
 
-export const getAllPharmacists = async () => {
-  return prisma.pharmacist.findMany({ 
-    orderBy: { createdAt: "desc" } 
+type PrescriptionUpdateInput = Partial<Omit<PrescriptionInput, "medicines">> & {
+  medicines?: MedicineInput[];
+};
+
+export const createPrescription = async (data: PrescriptionInput) => {
+  return prisma.prescription.create({
+    data: {
+      ...data,
+      medicines: {
+        create: data.medicines,
+      },
+    },
+    include: {
+      medicines: true,
+      doctor: true,
+      patient: true,
+    },
   });
 };
 
-export const getPharmacistById = async (id: number) => {
-  return prisma.pharmacist.findUnique({ where: { id } });
-};
-
-export const getPharmacistByRegistration = async (registrationNo: string) => {
-  return prisma.pharmacist.findUnique({ where: { registrationNo } });
-};
-
-export const getPharmacistsByDepartment = async (department: string) => {
-  return prisma.pharmacist.findMany({ 
-    where: { department },
-    orderBy: { fullName: "asc" }
+export const getAllPrescriptions = async () => {
+  return prisma.prescription.findMany({
+    orderBy: { prescriptionDate: "desc" },
+    include: {
+      medicines: true,
+      doctor: true,
+      patient: true,
+    },
   });
 };
 
-export const updatePharmacist = async (
-  id: number,
-  data: {
-    fullName?: string;
-    mobileNumber?: string;
-    registrationNo?: string;
-    address?: string;
-    department?: string;
-    status?: string;
-  }
-) => {
-  return prisma.pharmacist.update({
+export const getPrescriptionById = async (id: number) => {
+  return prisma.prescription.findUnique({
     where: { id },
-    data,
+    include: {
+      medicines: true,
+      doctor: true,
+      patient: true,
+    },
   });
 };
 
-export const deletePharmacist = async (id: number) => {
-  return prisma.pharmacist.delete({ where: { id } });
+export const getPrescriptionsByPatient = async (patientId: number) => {
+  return prisma.prescription.findMany({
+    where: { patientId },
+    orderBy: { prescriptionDate: "desc" },
+    include: {
+      medicines: true,
+      doctor: true,
+    },
+  });
+};
+
+export const updatePrescription = async (
+  id: number,
+  data: PrescriptionUpdateInput
+) => {
+  const updatedPrescription = await prisma.prescription.update({
+    where: { id },
+    data: {
+      prescriptionDate: data.prescriptionDate,
+      doctorId: data.doctorId,
+      patientId: data.patientId,
+      prescriptionDoc: data.prescriptionDoc,
+      status: data.status,
+    },
+    include: {
+      medicines: true,
+    },
+  });
+
+  if (data.medicines) {
+    await prisma.medicine.deleteMany({ where: { prescriptionId: id } });
+    await prisma.medicine.createMany({
+      data: data.medicines.map((med) => ({
+        ...med,
+        prescriptionId: id,
+      })),
+    });
+  }
+
+  return prisma.prescription.findUnique({
+    where: { id },
+    include: {
+      medicines: true,
+      doctor: true,
+      patient: true,
+    },
+  });
+};
+
+export const deletePrescription = async (id: number) => {
+  await prisma.medicine.deleteMany({ where: { prescriptionId: id } });
+  return prisma.prescription.delete({ where: { id } });
 };

@@ -15,7 +15,7 @@ router.route("/")
 
 router.route("/:id")
   .get(getBirthRecordById)
-  .patch(updateBirthRecord)
+  .put(updateBirthRecord)
   .delete(deleteBirthRecord);
 
 export default router;

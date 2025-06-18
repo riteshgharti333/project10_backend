@@ -12,18 +12,39 @@ import {
   updateBrand,
   deleteBrand,
 } from "../../services/itemService/brandService";
-
-const brandSchema = z.object({
-  brandName: z.string().min(1, "Brand name is required"),
-  brandLogo: z.string().url("Brand logo must be a valid URL"),
-  description: z.string().min(1, "Description is required"),
-  status: z.string().optional().default("Active"),
-});
+import {brandSchema} from "@hospital/schemas"
 
 export const createBrandRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const validated = brandSchema.parse(req.body);
+    const { file } = req;
 
+    // Parse and validate req.body (excluding file)
+    const validated = brandSchema
+      .omit({ brandLogo: true }) // remove brandLogo from validation
+      .parse(req.body);
+
+    // Validate file if exists
+    if (file) {
+      const acceptedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "image/svg+xml",
+      ];
+      if (!acceptedTypes.includes(file.mimetype)) {
+        return next(
+          new ErrorHandler("Invalid file type. Must be an image", StatusCodes.BAD_REQUEST)
+        );
+      }
+      if (file.size > 5_000_000) {
+        return next(
+          new ErrorHandler("File too large. Max 5MB allowed", StatusCodes.BAD_REQUEST)
+        );
+      }
+    }
+
+    // Check for duplicate brand name
     const existing = await getBrandByName(validated.brandName);
     if (existing) {
       return next(
@@ -31,7 +52,13 @@ export const createBrandRecord = catchAsyncError(
       );
     }
 
-    const brand = await createBrand(validated);
+    // Prepare final data to save
+    const payload = {
+      ...validated,
+      brandLogo: file?.path || null, // assuming multer saves file to disk or Cloudinary
+    };
+
+    const brand = await createBrand(payload);
 
     sendResponse(res, {
       success: true,
@@ -40,7 +67,7 @@ export const createBrandRecord = catchAsyncError(
       data: brand,
     });
   }
-);
+)
 
 export const getAllBrandRecords = catchAsyncError(
   async (_req: Request, res: Response) => {

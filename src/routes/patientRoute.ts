@@ -15,7 +15,7 @@ router.route("/")
 
 router.route("/:id")
   .get(getPatientRecordById)
-  .patch(updatePatientRecord)
+  .put(updatePatientRecord)
   .delete(deletePatientRecord);
 
 

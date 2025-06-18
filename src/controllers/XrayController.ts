@@ -13,25 +13,7 @@ import {
   updateXrayReport,
   deleteXrayReport,
 } from "../services/xrayService";
-
-const xrayReportSchema = z.object({
-  billDate: z.coerce.date(),
-  patientMobile: z.string().min(10, "Valid mobile number required"),
-  patientName: z.string().min(1, "Patient name is required"),
-  patientSex: z.enum(["Male", "Female", "Other"]),
-  age: z.number().int().min(0, "Age must be positive"),
-  referredDoctor: z.string().min(1, "Referred doctor is required"),
-  testDate: z.coerce.date(),
-  reportDate: z.coerce.date(),
-  patientAddress: z.string().optional(),
-  examDescription: z.string().min(1, "Exam description is required"),
-  department: z.string().min(1, "Department is required"),
-  billAmount: z.number().positive("Bill amount must be positive"),
-  discountPercent: z.number().min(0).max(100, "Discount must be between 0-100%"),
-  netBillAmount: z.number().positive("Net amount must be positive"),
-  commissionPercent: z.number().min(0).max(100, "Commission must be between 0-100%"),
-  doctorEarning: z.number().min(0, "Doctor earning must be positive"),
-});
+import { xrayReportSchema } from "@hospital/schemas";
 
 export const createXrayReportRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -39,19 +21,31 @@ export const createXrayReportRecord = catchAsyncError(
       ...req.body,
       billDate: new Date(req.body.billDate),
       testDate: new Date(req.body.testDate),
-      reportDate: new Date(req.body.reportDate)
+      reportDate: new Date(req.body.reportDate),
     });
 
     // Validate netBillAmount calculation
-    const calculatedNet = validated.billAmount * (1 - (validated.discountPercent / 100));
+    const calculatedNet =
+      validated.billAmount * (1 - validated.discountPercent / 100);
     if (Math.abs(calculatedNet - validated.netBillAmount) > 0.01) {
-      return next(new ErrorHandler("Net bill amount calculation doesn't match", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorHandler(
+          "Net bill amount calculation doesn't match",
+          StatusCodes.BAD_REQUEST
+        )
+      );
     }
 
     // Validate doctorEarning calculation
-    const calculatedEarning = validated.netBillAmount * (validated.commissionPercent / 100);
+    const calculatedEarning =
+      validated.netBillAmount * (validated.commissionPercent / 100);
     if (Math.abs(calculatedEarning - validated.doctorEarning) > 0.01) {
-      return next(new ErrorHandler("Doctor earning calculation doesn't match", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorHandler(
+          "Doctor earning calculation doesn't match",
+          StatusCodes.BAD_REQUEST
+        )
+      );
     }
 
     const report = await createXrayReport(validated);
@@ -70,9 +64,13 @@ export const getAllXrayReportRecords = catchAsyncError(
       patientMobile: req.query.patientMobile as string | undefined,
       patientName: req.query.patientName as string | undefined,
       referredDoctor: req.query.referredDoctor as string | undefined,
-      startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
-      endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
-      department: req.query.department as string | undefined
+      startDate: req.query.startDate
+        ? new Date(req.query.startDate as string)
+        : undefined,
+      endDate: req.query.endDate
+        ? new Date(req.query.endDate as string)
+        : undefined,
+      department: req.query.department as string | undefined,
     };
 
     const reports = await getAllXrayReports(filters);
@@ -94,7 +92,9 @@ export const getXrayReportRecordById = catchAsyncError(
 
     const report = await getXrayReportById(id);
     if (!report) {
-      return next(new ErrorHandler("X-ray report not found", StatusCodes.NOT_FOUND));
+      return next(
+        new ErrorHandler("X-ray report not found", StatusCodes.NOT_FOUND)
+      );
     }
 
     sendResponse(res, {
@@ -142,12 +142,16 @@ export const updateXrayReportRecord = catchAsyncError(
       ...req.body,
       billDate: req.body.billDate ? new Date(req.body.billDate) : undefined,
       testDate: req.body.testDate ? new Date(req.body.testDate) : undefined,
-      reportDate: req.body.reportDate ? new Date(req.body.reportDate) : undefined
+      reportDate: req.body.reportDate
+        ? new Date(req.body.reportDate)
+        : undefined,
     });
 
     const updatedReport = await updateXrayReport(id, validatedData);
     if (!updatedReport) {
-      return next(new ErrorHandler("X-ray report not found", StatusCodes.NOT_FOUND));
+      return next(
+        new ErrorHandler("X-ray report not found", StatusCodes.NOT_FOUND)
+      );
     }
 
     sendResponse(res, {
@@ -168,7 +172,9 @@ export const deleteXrayReportRecord = catchAsyncError(
 
     const deletedReport = await deleteXrayReport(id);
     if (!deletedReport) {
-      return next(new ErrorHandler("X-ray report not found", StatusCodes.NOT_FOUND));
+      return next(
+        new ErrorHandler("X-ray report not found", StatusCodes.NOT_FOUND)
+      );
     }
 
     sendResponse(res, {

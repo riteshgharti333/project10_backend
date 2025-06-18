@@ -2,66 +2,84 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createProduct = async (data: {
-  productName: string;
-  productCode: string;
-  parentCategory: string;
-  subCategory: string;
-  categoryLogo?: string;
+export type MaterialSpecificationInput = {
+  uom: string;
   description?: string;
-  unit: string;
-  price: number;
-  taxRate: number;
+  alterUnit?: string;
+  alterUnitValue?: number;
+  serialUniqueNo?: string;
+};
+
+export type ProductInput = {
+  brand: string;
+  category: string;
+  productName: string;
+  shortDescription?: string;
+  hsnCode: string;
+  gstPercentage: string;
   status?: string;
-}) => {
-  return prisma.product.create({ data });
+  specifications?: MaterialSpecificationInput[];
+};
+
+export type ProductUpdateInput = Partial<ProductInput> & {
+  specifications?: {
+    create?: MaterialSpecificationInput[];
+    update?: {
+      where: { id: number };
+      data: MaterialSpecificationInput;
+    }[];
+    delete?: { id: number }[];
+  };
+};
+
+export const createProduct = async (data: ProductInput) => {
+  return prisma.productEntery.create({
+    data: {
+      ...data,
+      specifications: data.specifications
+        ? { create: data.specifications }
+        : undefined,
+    },
+    include: { specifications: true },
+  });
 };
 
 export const getAllProducts = async () => {
-  return prisma.product.findMany({ 
-    orderBy: { createdAt: "desc" } 
+  return prisma.productEntery.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { specifications: true },
   });
 };
 
 export const getProductById = async (id: number) => {
-  return prisma.product.findUnique({ where: { id } });
-};
-
-export const getProductByCode = async (productCode: string) => {
-  return prisma.product.findUnique({ where: { productCode } });
-};
-
-export const getProductsByCategory = async (parentCategory: string, subCategory?: string) => {
-  return prisma.product.findMany({ 
-    where: { 
-      parentCategory,
-      ...(subCategory && { subCategory }) 
-    },
-    orderBy: { productName: "asc" }
+  return prisma.productEntery.findUnique({
+    where: { id },
+    include: { specifications: true },
   });
 };
 
-export const updateProduct = async (
-  id: number,
-  data: {
-    productName?: string;
-    productCode?: string;
-    parentCategory?: string;
-    subCategory?: string;
-    categoryLogo?: string;
-    description?: string;
-    unit?: string;
-    price?: number;
-    taxRate?: number;
-    status?: string;
-  }
-) => {
-  return prisma.product.update({
+export const getProductsByCategory = async (category: string) => {
+  return prisma.productEntery.findMany({
+    where: { category },
+    orderBy: { productName: "asc" },
+    include: { specifications: true },
+  });
+};
+
+export const updateProduct = async (id: number, data: ProductUpdateInput) => {
+  return prisma.productEntery.update({
     where: { id },
-    data,
+    data: {
+      ...data,
+      specifications: data.specifications,
+    },
+    include: { specifications: true },
   });
 };
 
 export const deleteProduct = async (id: number) => {
-  return prisma.product.delete({ where: { id } });
+  return prisma.productEntery.delete({
+    where: { id },
+    include: { specifications: true },
+  });
 };

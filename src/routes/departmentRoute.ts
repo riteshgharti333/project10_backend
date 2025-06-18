@@ -15,7 +15,7 @@ router.route("/")
 
 router.route("/:id")
   .get(getDepartmentRecordById)
-  .patch(updateDepartmentRecord)
+  .put(updateDepartmentRecord)
   .delete(deleteDepartmentRecord);
 
 export default router;

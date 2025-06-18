@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createNurse = async (data: {
+export type NurseInput = {
   fullName: string;
   mobileNumber: string;
   registrationNo: string;
@@ -10,7 +10,9 @@ export const createNurse = async (data: {
   address: string;
   shift: string;
   status?: string;
-}) => {
+};
+
+export const createNurse = async (data: NurseInput) => {
   return prisma.nurse.create({ data });
 };
 
@@ -28,15 +30,7 @@ export const getNurseByRegistration = async (registrationNo: string) => {
 
 export const updateNurse = async (
   id: number,
-  data: {
-    fullName?: string;
-    mobileNumber?: string;
-    registrationNo?: string;
-    department?: string;
-    address?: string;
-    shift?: string;
-    status?: string;
-  }
+  data: Partial<NurseInput>
 ) => {
   return prisma.nurse.update({
     where: { id },

@@ -12,17 +12,9 @@ import {
   updateServiceCharge,
   deleteServiceCharge,
 } from "../../services/itemService/serviceChargesService";
+import {serviceChargeSchema} from "@hospital/schemas"
 
-const serviceChargeSchema = z.object({
-  serviceName: z.string().min(1, "Service name is required"),
-  category: z.string().min(1, "Category is required"),
-  chargeType: z.string().min(1, "Charge type is required"),
-  baseAmount: z.number().min(0, "Base amount must be positive"),
-  taxApplicable: z.boolean().default(false),
-  taxPercentage: z.number().min(0).max(100).optional(),
-  status: z.string().optional().default("Active"),
-  notes: z.string().optional(),
-});
+
 
 export const createServiceChargeRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -14,18 +14,7 @@ import {
   deleteSupplierLedgerEntry,
 } from "../../services/ledgerService/supplierLedgerService";
 
-const supplierLedgerSchema = z.object({
-  supplierName: z.string().min(1, "Supplier name is required"),
-  date: z.coerce.date(),
-  invoiceNo: z.string().min(1, "Invoice number is required"),
-  description: z.string().min(1, "Description is required"),
-  amountType: z.enum(["Credit", "Debit"]),
-  amount: z.number().positive("Amount must be positive"),
-  paymentMode: z.string().optional(),
-  transactionId: z.string().optional(),
-  attachBill: z.string().optional(),
-  remarks: z.string().optional(),
-});
+import { supplierLedgerSchema } from "@hospital/schemas";
 
 export const createSupplierLedgerRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -12,19 +12,8 @@ import {
   updateBirth,
   deleteBirth,
 } from "../services/birthService";
+import { birthSchema } from "@hospital/schemas";
 
-const birthSchema = z.object({
-  birthTime: z.string().min(1, "Birth time is required"),
-  birthDate: z.coerce.date(),
-  babySex: z.string().min(1, "Baby's sex is required"),
-  babyWeightKg: z.number().positive("Weight must be positive"),
-  fathersName: z.string().min(1, "Father's name is required"),
-  mothersName: z.string().min(1, "Mother's name is required"),
-  mobileNumber: z.string().min(10, "Mobile number must be at least 10 digits"),
-  deliveryType: z.string().min(1, "Delivery type is required"),
-  placeOfBirth: z.string().min(1, "Place of birth is required"),
-  attendantsName: z.string().min(1, "Attendant's name is required"),
-});
 
 export const createBirthRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

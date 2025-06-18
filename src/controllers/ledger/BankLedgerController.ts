@@ -13,15 +13,7 @@ import {
   deleteBankLedgerEntry,
 } from "../../services/ledgerService/bankLedgerService";
 
-const bankLedgerSchema = z.object({
-  bankName: z.string().min(1, "Bank name is required"),
-  date: z.coerce.date(),
-  description: z.string().min(1, "Description is required"),
-  amountType: z.enum(["Credit", "Debit"]),
-  amount: z.number().positive("Amount must be positive"),
-  transactionId: z.string().optional(),
-  remarks: z.string().optional(),
-});
+import { bankLedgerSchema } from "@hospital/schemas";
 
 export const createBankLedgerRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -8,34 +8,8 @@ import { StatusCodes } from "../constants/statusCodes";
 
 const prisma = new PrismaClient();
 
-const admissionSchema = z.object({
-  admissionDate: z.coerce.date(),
-  admissionTime: z.string().min(1, "Admission time is required"),
- dischargeDate: z.preprocess(
-  (val) => (val === "" ? undefined : val),
-  z.coerce.date().optional()
-),
+import { admissionSchema } from "@hospital/schemas";
 
-  gsRsRegNo: z.string().min(1, "GS/RS Reg No is required"),
-  wardNo: z.string().min(1, "Ward No is required"),
-  bedNo: z.string().min(1, "Bed No is required"),
-  bloodGroup: z.string().min(1, "Blood group is required"),
-  aadhaarNo: z.string().min(12, "Aadhaar No must be 12 digits").max(12),
-  urnNo: z.string().optional(),
-  patientName: z.string().min(1, "Patient name is required"),
-  patientAge: z.number().int().positive("Age must be positive"),
-  patientSex: z.string().min(1, "Patient sex is required"),
-  guardianType: z.string().min(1, "Guardian type is required"),
-  guardianName: z.string().min(1, "Guardian name is required"),
-  phoneNo: z.string().min(10, "Phone number must be at least 10 digits"),
-  patientAddress: z.string().min(1, "Address is required"),
-  bodyWeightKg: z.number().optional(),
-  bodyHeightCm: z.number().optional(),
-  literacy: z.string().min(1, "Literacy status is required"),
-  occupation: z.string().min(1, "Occupation is required"),
-  doctorName: z.string().min(1, "Doctor name is required"),
-  isDelivery: z.boolean().default(false),
-});
 
 // CREATE
 export const createAdmission = catchAsyncError(

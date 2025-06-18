@@ -2,7 +2,18 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createPatient = async (data: any) => {
+export type PatientInput = {
+  fullName: string;
+  age: number;
+  mobileNumber: string;
+  gender: string;
+  bedNumber: string;
+  aadhaarNumber: string;
+  address: string;
+  medicalHistory: string;
+};
+
+export const createPatient = async (data: PatientInput) => {
   return prisma.patient.create({ data });
 };
 
@@ -18,7 +29,7 @@ export const getPatientByAadhaar = async (aadhaarNumber: string) => {
   return prisma.patient.findUnique({ where: { aadhaarNumber } });
 };
 
-export const updatePatient = async (id: number, data: any) => {
+export const updatePatient = async (id: number, data: Partial<PatientInput>) => {
   return prisma.patient.update({
     where: { id },
     data,

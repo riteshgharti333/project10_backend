@@ -12,21 +12,12 @@ import {
   updateDiagnosticsEntry,
   deleteDiagnosticsEntry,
 } from "../../services/ledgerService/diagnosticsLedgerService";
+import { diagnosticsLedgerSchema } from "@hospital/schemas";
 
-const diagnosticsSchema = z.object({
-  patientName: z.string().min(1, "Patient name is required"),
-  date: z.coerce.date(),
-  testName: z.string().min(1, "Test name is required"),
-  description: z.string().min(1, "Description is required"),
-  amount: z.number().positive("Amount must be positive"),
-  paymentMode: z.string().min(1, "Payment mode is required"),
-  attachReport: z.string().optional(),
-  remarks: z.string().optional(),
-});
 
 export const createDiagnosticsRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const validated = diagnosticsSchema.parse({
+    const validated = diagnosticsLedgerSchema.parse({
       ...req.body,
       date: new Date(req.body.date)
     });
@@ -105,7 +96,7 @@ export const updateDiagnosticsRecord = catchAsyncError(
       return next(new ErrorHandler("Invalid ID", StatusCodes.BAD_REQUEST));
     }
 
-    const partialSchema = diagnosticsSchema.partial();
+    const partialSchema = diagnosticsLedgerSchema.partial();
     const validatedData = partialSchema.parse({
       ...req.body,
       date: req.body.date ? new Date(req.body.date) : undefined

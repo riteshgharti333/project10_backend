@@ -16,16 +16,7 @@ import {
   deleteBedAssignment,
 } from "../services/bedAssignService";
 
-const bedAssignmentSchema = z.object({
-  wardNumber: z.string().min(1, "Ward number is required"),
-  bedNumber: z.string().min(1, "Bed number is required"),
-  bedType: z.string().min(1, "Bed type is required"),
-  patientName: z.string().min(1, "Patient name is required"),
-  allocateDate: z.coerce.date(),
-  dischargeDate: z.coerce.date().optional(),
-  status: z.enum(["Active", "Discharged", "Transferred"]).default("Active"),
-  notes: z.string().optional(),
-});
+import {bedAssignmentSchema} from "@hospital/schemas"
 
 export const createBedAssignmentRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -42,7 +33,7 @@ export const createBedAssignmentRecord = catchAsyncError(
       data: assignment,
     });
   }
-);
+)
 
 export const getAllBedAssignmentRecords = catchAsyncError(
   async (req: Request, res: Response) => {

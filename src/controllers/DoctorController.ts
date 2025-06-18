@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { z } from "zod";
 import { catchAsyncError } from "../middlewares/catchAsyncError";
 import { ErrorHandler } from "../middlewares/errorHandler";
 import { sendResponse } from "../utils/sendResponse";
@@ -13,17 +12,8 @@ import {
   updateDoctor,
   deleteDoctor,
 } from "../services/doctorService";
+import { doctorSchema } from "@hospital/schemas";
 
-const doctorSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  mobileNumber: z.string().min(10, "Mobile number must be at least 10 digits"),
-  registrationNo: z.string().min(1, "Registration number is required"),
-  qualification: z.string().min(1, "Qualification is required"),
-  designation: z.string().min(1, "Designation is required"),
-  department: z.string().min(1, "Department is required"),
-  specialization: z.string().min(1, "Specialization is required"),
-  status: z.string().optional().default("Active"),
-});
 
 export const createDoctorRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -127,6 +117,8 @@ export const updateDoctorRecord = catchAsyncError(
   }
 );
 
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+
 export const deleteDoctorRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = Number(req.params.id);
@@ -134,16 +126,42 @@ export const deleteDoctorRecord = catchAsyncError(
       return next(new ErrorHandler("Invalid ID", StatusCodes.BAD_REQUEST));
     }
 
-    const deletedDoctor = await deleteDoctor(id);
-    if (!deletedDoctor) {
-      return next(new ErrorHandler("Doctor not found", StatusCodes.NOT_FOUND));
-    }
+    try {
+      const deletedDoctor = await deleteDoctor(id);
 
-    sendResponse(res, {
-      success: true,
-      statusCode: StatusCodes.OK,
-      message: "Doctor deleted successfully",
-      data: deletedDoctor,
-    });
+      if (!deletedDoctor) {
+        return next(
+          new ErrorHandler("Doctor not found", StatusCodes.NOT_FOUND)
+        );
+      }
+
+      sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Doctor deleted successfully",
+        data: deletedDoctor,
+      });
+    } catch (error) {
+      // Handle foreign key constraint violation
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === "P2003"
+      ) {
+        return next(
+          new ErrorHandler(
+            "Cannot delete doctor: Prescriptions linked to this doctor exist.",
+            StatusCodes.CONFLICT
+          )
+        );
+      }
+
+      // Generic error fallback
+      return next(
+        new ErrorHandler(
+          "An error occurred while deleting doctor",
+          StatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
   }
 );

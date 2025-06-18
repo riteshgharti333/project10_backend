@@ -13,20 +13,11 @@ import {
   deleteLedgerEntry,
 } from "../../services/ledgerService/patientLedgerService";
 
-const ledgerEntrySchema = z.object({
-  patientName: z.string().min(1, "Patient name is required"),
-  date: z.coerce.date(),
-  description: z.string().min(1, "Description is required"),
-  amountType: z.enum(["Credit", "Debit"]),
-  amount: z.number().positive("Amount must be positive"),
-  paymentMode: z.string().min(1, "Payment mode is required"),
-  transactionId: z.string().optional(),
-  remarks: z.string().optional(),
-});
+import { patientLedgerSchema } from "@hospital/schemas";
 
 export const createLedgerEntryRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const validated = ledgerEntrySchema.parse({
+    const validated = patientLedgerSchema.parse({
       ...req.body,
       date: new Date(req.body.date)
     });
@@ -35,7 +26,7 @@ export const createLedgerEntryRecord = catchAsyncError(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.CREATED,
-      message: "Ledger entry created successfully",
+      message: "Patient ledger entry created successfully",
       data: entry,
     });
   }
@@ -105,7 +96,7 @@ export const updateLedgerEntryRecord = catchAsyncError(
       return next(new ErrorHandler("Invalid ID", StatusCodes.BAD_REQUEST));
     }
 
-    const partialSchema = ledgerEntrySchema.partial();
+    const partialSchema = patientLedgerSchema.partial();
     const validatedData = partialSchema.parse({
       ...req.body,
       date: req.body.date ? new Date(req.body.date) : undefined

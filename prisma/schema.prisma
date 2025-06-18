@@ -8,23 +8,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String    @id @default(uuid())
-  name         String
-  email        String    @unique
-  passwordHash String
-  salt         String
-  role         String    @default("USER")
-  isVerified   Boolean   @default(false)
-  verificationToken String?
-  resetToken    String?
-  resetTokenExpires DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt  DateTime?
 
-  @@index([email])
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
 
 /////////////////
 
@@ -127,7 +120,8 @@ model BedAssignment {
   id            Int      @id @default(autoincrement())
   wardNumber    String
   bedNumber     String
-  bedType       String   
+  bedType       String  
+  notes         String?   
   patientName   String
   allocateDate  DateTime
   dischargeDate DateTime?
@@ -209,7 +203,7 @@ model Prescription {
   prescriptionDate DateTime
   doctorId         Int
   patientId        Int
-  prescriptionDoc  String?       // File path or URL to prescription document
+  prescriptionDoc  String?      
   status           String        @default("Active")
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
@@ -448,7 +442,7 @@ model XrayReport {
 model Brand {
   id          Int      @id @default(autoincrement())
   brandName   String   @unique
-  brandLogo   String
+  brandLogo   String?
   description String
   status      String   @default("Active")
   createdAt   DateTime @default(now())
@@ -463,7 +457,7 @@ model ProductEntery {
   productName      String
   shortDescription String?
   hsnCode          String
-  gstPercentage    Float
+  gstPercentage    String
   status           String                @default("Active")
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
@@ -538,12 +532,15 @@ model Bill {
 model BillItem {
   id             Int      @id @default(autoincrement())
   billId         Int
-  bill           Bill      @relation(fields: [billId], references: [id], onDelete: Cascade)
+  bill           Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
   company        String
   itemOrService  String
   quantity       Int
+  mrp            Float  
+  totalAmount    Float   
   createdAt      DateTime @default(now())
 }
+
 
 model Employee {
   id                  Int       @id @default(autoincrement())

@@ -12,12 +12,7 @@ import {
   deleteAppointment,
 } from "../services/appointmentService";
 
-const appointmentSchema = z.object({
-  appointmentDate: z.coerce.date(),
-  doctorName: z.string().min(1, "Doctor name is required"),
-  department: z.string().min(1, "Department is required"),
-  appointmentTime: z.string().min(1, "Appointment time is required"),
-});
+import {appointmentSchema} from "@hospital/schemas"
 
 export const createAppointmentRecord = catchAsyncError(
   async (req: Request, res: Response) => {

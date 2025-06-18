@@ -13,15 +13,8 @@ import {
   updatePharmacist,
   deletePharmacist,
 } from "../services/pharmacistService";
-
-const pharmacistSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  mobileNumber: z.string().min(10, "Mobile number must be at least 10 digits"),
-  registrationNo: z.string().min(1, "Registration number is required"),
-  address: z.string().min(1, "Address is required"),
-  department: z.string().min(1, "Department is required"),
-  status: z.string().optional().default("Active"),
-});
+import { pharmacistSchema } from "@hospital/schemas";
+// import {medicineSchema} from "@hospital/schemas"
 
 export const createPharmacistRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -13,16 +13,7 @@ import {
   deleteMoneyReceipt,
 } from "../../services/transectionService/moneyReceiptService";
 
-const moneyReceiptSchema = z.object({
-  date: z.string().transform((val) => new Date(val)),
-  patientName: z.string().min(1, "Patient name is required"),
-  mobile: z.string().min(10, "Mobile must be at least 10 digits"),
-  amount: z.number().min(0.01, "Amount must be positive"),
-  paymentMode: z.enum(["Cash", "Cheque", "Card", "Online Transfer", "Other"]),
-  remarks: z.string().optional(),
-  receivedBy: z.string().min(1, "Received by is required"),
-  status: z.enum(["Active", "Cancelled", "Refunded"]).optional().default("Active"),
-});
+import {moneyReceiptSchema} from "@hospital/schemas" 
 
 export const createMoneyReceiptRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

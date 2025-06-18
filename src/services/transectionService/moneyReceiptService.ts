@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface MoneyReceiptCreateInput {
+export type MoneyReceiptInput = {
   date: Date;
   patientName: string;
   mobile: string;
@@ -11,39 +11,42 @@ interface MoneyReceiptCreateInput {
   remarks?: string;
   receivedBy: string;
   status?: string;
-}
+};
 
-export const createMoneyReceipt = async (data: MoneyReceiptCreateInput) => {
+export const createMoneyReceipt = async (data: MoneyReceiptInput) => {
   return prisma.moneyReceipt.create({ data });
 };
 
-export const getAllMoneyReceipts = async (searchParams: {
+export const getAllMoneyReceipts = async (filters?: {
   mobile?: string;
   patientName?: string;
   amount?: number;
   paymentMode?: string;
 }) => {
-  const whereClause: any = {};
-  
-  if (searchParams.mobile) {
-    whereClause.mobile = { contains: searchParams.mobile };
-  }
-  
-  if (searchParams.patientName) {
-    whereClause.patientName = { contains: searchParams.patientName, mode: 'insensitive' };
-  }
-  
-  if (searchParams.amount) {
-    whereClause.amount = searchParams.amount;
-  }
-  
-  if (searchParams.paymentMode) {
-    whereClause.paymentMode = searchParams.paymentMode;
+  const where: any = {};
+
+  if (filters?.mobile) {
+    where.mobile = { contains: filters.mobile };
   }
 
-  return prisma.moneyReceipt.findMany({ 
-    where: whereClause,
-    orderBy: { date: "desc" } 
+  if (filters?.patientName) {
+    where.patientName = {
+      contains: filters.patientName,
+      mode: "insensitive",
+    };
+  }
+
+  if (filters?.amount) {
+    where.amount = filters.amount;
+  }
+
+  if (filters?.paymentMode) {
+    where.paymentMode = filters.paymentMode;
+  }
+
+  return prisma.moneyReceipt.findMany({
+    where,
+    orderBy: { date: "desc" },
   });
 };
 
@@ -51,30 +54,24 @@ export const getMoneyReceiptById = async (id: number) => {
   return prisma.moneyReceipt.findUnique({ where: { id } });
 };
 
-export const getMoneyReceiptsByDateRange = async (startDate: Date, endDate: Date) => {
+export const getMoneyReceiptsByDateRange = async (
+  startDate: Date,
+  endDate: Date
+) => {
   return prisma.moneyReceipt.findMany({
     where: {
       date: {
         gte: startDate,
-        lte: endDate
-      }
+        lte: endDate,
+      },
     },
-    orderBy: { date: "desc" }
+    orderBy: { date: "desc" },
   });
 };
 
 export const updateMoneyReceipt = async (
   id: number,
-  data: {
-    date?: Date;
-    patientName?: string;
-    mobile?: string;
-    amount?: number;
-    paymentMode?: string;
-    remarks?: string;
-    receivedBy?: string;
-    status?: string;
-  }
+  data: Partial<MoneyReceiptInput>
 ) => {
   return prisma.moneyReceipt.update({
     where: { id },

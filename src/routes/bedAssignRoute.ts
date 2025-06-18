@@ -16,7 +16,7 @@ router.route("/")
 
 router.route("/:id")
   .get(getBedAssignmentRecordById)
-  .patch(updateBedAssignmentRecord)
+  .put(updateBedAssignmentRecord)
   .delete(deleteBedAssignmentRecord);
 
 router.post("/:id/discharge", dischargePatientFromBed);

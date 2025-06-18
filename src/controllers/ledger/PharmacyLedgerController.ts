@@ -13,17 +13,7 @@ import {
   updatePharmacyLedgerEntry,
   deletePharmacyLedgerEntry,
 } from "../../services/ledgerService/pharmacyLedgerService";
-
-const pharmacyLedgerSchema = z.object({
-  date: z.coerce.date(),
-  medicineName: z.string().min(1, "Medicine name is required"),
-  category: z.string().min(1, "Category is required"),
-  description: z.string().min(1, "Description is required"),
-  amountType: z.enum(["Income", "Expense"]),
-  amount: z.number().positive("Amount must be positive"),
-  paymentMode: z.string().min(1, "Payment mode is required"),
-  remarks: z.string().optional(),
-});
+import { pharmacyLedgerSchema } from "@hospital/schemas";
 
 export const createPharmacyLedgerRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -1,20 +1,16 @@
-import express from 'express';
-import * as authController from '../controllers/authController';
-import * as authValidation from '../validations/authValidation';
-import validate from '../middlewares/validate';
-import { authenticate } from '../middlewares/auth';
+import express from "express";
+import { login, register, logout } from "../controllers/authController";
 
 const router = express.Router();
 
-router.post('/register', validate(authValidation.register), authController.register);
-router.post('/login', validate(authValidation.login), authController.login);
-router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
-router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
+// Register
+router.post("/register", register);
 
-router.use(authenticate);
+// Login
+router.post("/login", login);
 
-router.get('/profile', authController.getProfile);
-router.patch('/update-password', validate(authValidation.updatePassword), authController.updatePassword);
-router.get('/verify-email', authController.verifyEmail);
+router.post("/logout", logout);
+
+
 
 export default router;

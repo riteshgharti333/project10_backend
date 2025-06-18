@@ -2,7 +2,10 @@ import express, { Application } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
+
+import authRoutes from "./routes/authRoute"
 
 import departmentRoutes from "./routes/departmentRoute";
 import admissionRoutes from "./routes/admissionRoute";
@@ -18,7 +21,7 @@ import prescriptionRoutes from "./routes/prescriptionRoute";
 import ambulanceRoutes from "./routes/ambulanceRoute";
 import xrayRoutes from "./routes/xrayRoute";
 
-// ledger
+// ledger 
 import patientLedgerRoutes from "./routes/ledgerRoutes/patientLedgerRoute";
 import bankLedgerRoutes from "./routes/ledgerRoutes/bankLedgerRoute";
 import cashLedgerRoutes from "./routes/ledgerRoutes/cashLedgerRoute";
@@ -63,8 +66,13 @@ app.use(
   })
 );
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(morgan("dev"));
+
+
+app.use("/api/v1/auth", authRoutes);
+
 
 app.use("/api/v1/admission", admissionRoutes);
 app.use("/api/v1/birth", birthRoutes);
@@ -101,8 +109,7 @@ app.use("/api/v1/service-charges", serviceChargesRoutes);
 app.use("/api/v1/transection/bill", billRoutes);
 app.use("/api/v1/transection/voucher", voucherRoutes);
 app.use("/api/v1/transection/money-receipt", moneyReceiptRoutes);
-
-// app.use("/api/v1/transection/employee", employeeRoutes);
+app.use("/api/v1/transection/employee", employeeRoutes);
 
 // Sample Route
 app.get("/", (_req, res) => {

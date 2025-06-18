@@ -12,17 +12,7 @@ import {
   updatePatient,
   deletePatient,
 } from "../services/patientService";
-
-const patientSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  age: z.number().int().positive("Age must be positive"),
-  mobileNumber: z.string().min(10, "Mobile number must be 10 digits"),
-  gender: z.string().min(1, "Gender is required"),
-  bedNumber: z.string().min(1, "Bed number is required"),
-  aadhaarNumber: z.string().length(12, "Aadhaar must be 12 digits"),
-  address: z.string().min(1, "Address is required"),
-  medicalHistory: z.string().min(1, "Medical history is required"),
-});
+import { patientSchema } from "@hospital/schemas";
 
 export const createPatientRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

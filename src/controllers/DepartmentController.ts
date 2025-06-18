@@ -13,15 +13,8 @@ import {
   deleteDepartment
 } from "../services/departmentService";
 
-const departmentSchema = z.object({
-  name: z.string().min(1, "Department name is required"),
-  head: z.string().min(1, "Department head is required"),
-  contactNumber: z.string().min(10, "Contact number must be 10 digits"),
-  email: z.string().email("Invalid email address"),
-  location: z.string().min(1, "Location is required"),
-  description: z.string().min(1, "Description is required"),
-  status: z.string().optional().default("Active"),
-});
+import { departmentSchema } from "@hospital/schemas";
+
 
 export const createDepartmentRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

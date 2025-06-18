@@ -1,11 +1,7 @@
-// src/middlewares/errorMiddleware.ts
-
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
-import mongoose from "mongoose";
 import { ErrorHandler } from "./errorHandler";
-
-
+import mongoose from "mongoose";
 
 export const errorMiddleware = (
   err: any,
@@ -16,29 +12,28 @@ export const errorMiddleware = (
   let statusCode = 500;
   let message: string | string[] = "Internal Server Error";
 
-  // 1. Handle Zod Validation Error
+  // ZOD Error
   if (err instanceof ZodError) {
     statusCode = 400;
     message = err.errors.map((e) => `${e.path.join(".")}: ${e.message}`);
   }
-
-  // 2. Handle Mongoose Validation Error
+  // Custom ErrorHandler
+  else if (err instanceof ErrorHandler) {
+    statusCode = err.statusCode;
+    message = err.message;
+  }
+  // Mongoose Validation
   else if (err instanceof mongoose.Error.ValidationError) {
     statusCode = 400;
-    message = Object.values(err.errors).map((val) => val.message);
+    message = Object.values(err.errors).map((val: any) => val.message);
   }
-
-  // 3. Handle Duplicate Key Error (unique constraints)
+  // Duplicate Key Error (for Mongoose/Prisma)
   else if (err.code === 11000) {
     statusCode = 409;
-    const duplicateField = Object.keys(err.keyValue)[0];
-    message = `Duplicate entry for ${duplicateField}: "${err.keyValue[duplicateField]}"`;
-  }
-
-  // 4. Custom Error Handler
-  else if (err instanceof ErrorHandler) {
-    statusCode = err.statusCode || 500;
-    message = err.message || "Internal Server Error";
+    const field = Object.keys(err.keyValue)[0];
+    message = `Duplicate field: ${field}`;
+  } else {
+    console.error("Unhandled Error 💥", err);
   }
 
   res.status(statusCode).json({

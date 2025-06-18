@@ -15,7 +15,7 @@ router.route("/")
 
 router.route("/:id")
   .get(getBedRecordById)
-  .patch(updateBedRecord)
+  .put(updateBedRecord)
   .delete(deleteBedRecord);
 
 export default router;

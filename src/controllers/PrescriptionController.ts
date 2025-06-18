@@ -13,36 +13,37 @@ import {
   deletePrescription,
 } from "../services/prescriptionService";
 
-const medicineSchema = z.object({
-  medicineName: z.string().min(1, "Medicine name is required"),
-  description: z.string().min(1, "Description is required"),
-});
+import {prescriptionSchema} from "@hospital/schemas"
 
-const prescriptionSchema = z.object({
-  prescriptionDate: z.coerce.date(),
-  doctorId: z.number().min(1, "Doctor ID is required"),
-  patientId: z.number().min(1, "Patient ID is required"),
-  prescriptionDoc: z.string().optional(),
-  status: z.string().optional().default("Active"),
-  medicines: z.array(medicineSchema).min(1, "At least one medicine is required"),
-});
 
-export const createPrescriptionRecord = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+export const createPrescriptionRecord = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // ✅ Validate and parse
     const validated = prescriptionSchema.parse({
       ...req.body,
-      prescriptionDate: new Date(req.body.prescriptionDate)
+      prescriptionDate: new Date(req.body.prescriptionDate),
     });
 
+    // ✅ Create in DB
     const prescription = await createPrescription(validated);
+
+    // ✅ Success response
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.CREATED,
       message: "Prescription created successfully",
       data: prescription,
     });
+  } catch (error) {
+    // ❌ If validation or DB fails, send error
+    console.log(error)
+    next(error); // Forward error to Express error handler middleware
   }
-);
+};
 
 export const getAllPrescriptionRecords = catchAsyncError(
   async (req: Request, res: Response) => {

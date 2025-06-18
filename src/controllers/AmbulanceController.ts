@@ -12,15 +12,7 @@ import {
   updateAmbulance,
   deleteAmbulance,
 } from "../services/ambulanceService";
-
-const ambulanceSchema = z.object({
-  modelName: z.string().min(1, "Model name is required"),
-  brand: z.string().min(1, "Brand is required"),
-  registrationNo: z.string().min(1, "Registration number is required"),
-  driverName: z.string().min(1, "Driver name is required"),
-  driverContact: z.string().min(10, "Driver contact must be at least 10 digits"),
-  status: z.enum(["Available", "On-Call", "Maintenance"]).default("Available"),
-});
+import {ambulanceSchema} from "@hospital/schemas"
 
 export const createAmbulanceRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

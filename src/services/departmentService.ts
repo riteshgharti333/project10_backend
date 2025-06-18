@@ -2,7 +2,17 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createDepartment = async (data: any) => {
+export type DepartmentInput = {
+  name: string;
+  head: string;
+  contactNumber: string;
+  email: string;
+  location: string;
+  description: string;
+  status?: string;
+};
+
+export const createDepartment = async (data: DepartmentInput) => {
   return prisma.department.create({ data });
 };
 
@@ -18,7 +28,10 @@ export const getDepartmentByName = async (name: string) => {
   return prisma.department.findUnique({ where: { name } });
 };
 
-export const updateDepartment = async (id: number, data: any) => {
+export const updateDepartment = async (
+  id: number,
+  data: Partial<DepartmentInput>
+) => {
   return prisma.department.update({
     where: { id },
     data,

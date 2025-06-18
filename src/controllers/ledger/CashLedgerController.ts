@@ -13,13 +13,7 @@ import {
   deleteCashLedgerEntry,
 } from "../../services/ledgerService/cashLedgerService";
 
-const cashLedgerSchema = z.object({
-  date: z.coerce.date(),
-  purpose: z.string().min(1, "Purpose is required"),
-  amountType: z.enum(["Income", "Expense"]),
-  amount: z.number().positive("Amount must be positive"),
-  remarks: z.string().optional(),
-});
+import { cashLedgerSchema } from "@hospital/schemas";
 
 export const createCashLedgerRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

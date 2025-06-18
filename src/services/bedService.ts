@@ -2,7 +2,14 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createBed = async (data: any) => {
+export type BedInput = {
+  bedNumber: string;
+  wardNumber: string;
+  status?: string;
+  description?: string;
+};
+
+export const createBed = async (data: BedInput) => {
   return prisma.bed.create({ data });
 };
 
@@ -22,7 +29,7 @@ export const getBedsByWard = async (wardNumber: string) => {
   return prisma.bed.findMany({ where: { wardNumber } });
 };
 
-export const updateBed = async (id: number, data: any) => {
+export const updateBed = async (id: number, data: Partial<BedInput>) => {
   return prisma.bed.update({
     where: { id },
     data,

@@ -1,41 +1,47 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Brand } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const createBrand = async (data: {
+// Types
+export type CreateBrandInput = {
   brandName: string;
   brandLogo: string;
   description: string;
   status?: string;
-}) => {
+};
+
+export type UpdateBrandInput = Partial<CreateBrandInput>;
+
+// Create a new brand
+export const createBrand = async (data: CreateBrandInput): Promise<Brand> => {
   return prisma.brand.create({ data });
 };
 
-export const getAllBrands = async () => {
+// Get all brands (sorted latest first)
+export const getAllBrands = async (): Promise<Brand[]> => {
   return prisma.brand.findMany({
     orderBy: { createdAt: "desc" },
   });
 };
 
-export const getBrandById = async (id: number) => {
+// Get brand by ID
+export const getBrandById = async (id: number): Promise<Brand | null> => {
   return prisma.brand.findUnique({ where: { id } });
 };
 
-export const getBrandByName = async (brandName: string) => {
+// Get brand by Name
+export const getBrandByName = async (brandName: string): Promise<Brand | null> => {
   return prisma.brand.findUnique({ where: { brandName } });
 };
 
+// Update a brand
 export const updateBrand = async (
   id: number,
-  data: {
-    brandName?: string;
-    brandLogo?: string;
-    description?: string;
-    status?: string;
-  }
-) => {
+  data: UpdateBrandInput
+): Promise<Brand> => {
   return prisma.brand.update({ where: { id }, data });
 };
 
-export const deleteBrand = async (id: number) => {
+// Delete a brand
+export const deleteBrand = async (id: number): Promise<Brand> => {
   return prisma.brand.delete({ where: { id } });
 };

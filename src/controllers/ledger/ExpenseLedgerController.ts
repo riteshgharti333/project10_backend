@@ -14,19 +14,11 @@ import {
   deleteExpenseEntry,
 } from "../../services/ledgerService/expenseLedgerService";
 
-const expenseSchema = z.object({
-  expenseCategory: z.string().min(1, "Expense category is required"),
-  date: z.coerce.date(),
-  description: z.string().min(1, "Description is required"),
-  amount: z.number().positive("Amount must be positive"),
-  paymentMode: z.string().min(1, "Payment mode is required"),
-  transactionId: z.string().optional(),
-  remarks: z.string().optional(),
-});
+import { expenseLedgerSchema } from "@hospital/schemas";
 
 export const createExpenseRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const validated = expenseSchema.parse({
+    const validated = expenseLedgerSchema.parse({
       ...req.body,
       date: new Date(req.body.date)
     });
@@ -101,7 +93,7 @@ export const updateExpenseRecord = catchAsyncError(
       return next(new ErrorHandler("Invalid ID", StatusCodes.BAD_REQUEST));
     }
 
-    const partialSchema = expenseSchema.partial();
+    const partialSchema = expenseLedgerSchema.partial();
     const validatedData = partialSchema.parse({
       ...req.body,
       date: req.body.date ? new Date(req.body.date) : undefined

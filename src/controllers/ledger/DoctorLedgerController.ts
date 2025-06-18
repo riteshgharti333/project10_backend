@@ -13,16 +13,7 @@ import {
   deleteDoctorLedgerEntry,
 } from "../../services/ledgerService/doctorLedgerService";
 
-const doctorLedgerSchema = z.object({
-  doctorName: z.string().min(1, "Doctor name is required"),
-  date: z.coerce.date(),
-  description: z.string().min(1, "Description is required"),
-  amountType: z.enum(["Credit", "Debit"]),
-  amount: z.number().positive("Amount must be positive"),
-  paymentMode: z.string().min(1, "Payment mode is required"),
-  transactionId: z.string().optional(),
-  remarks: z.string().optional(),
-});
+import { doctorLedgerSchema } from "@hospital/schemas";
 
 export const createDoctorLedgerRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

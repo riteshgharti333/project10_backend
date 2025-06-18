@@ -12,16 +12,8 @@ import {
   updateNurse,
   deleteNurse,
 } from "../services/nurseService";
+import { nurseSchema } from "@hospital/schemas";
 
-const nurseSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  mobileNumber: z.string().min(10, "Mobile number must be at least 10 digits"),
-  registrationNo: z.string().min(1, "Registration number is required"),
-  department: z.string().min(1, "Department is required"),
-  address: z.string().min(1, "Address is required"),
-  shift: z.string().min(1, "Shift is required"),
-  status: z.string().optional().default("Active"),
-});
 
 export const createNurseRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

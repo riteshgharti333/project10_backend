@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createDoctor = async (data: {
+export type DoctorInput = {
   fullName: string;
   mobileNumber: string;
   registrationNo: string;
@@ -11,14 +11,14 @@ export const createDoctor = async (data: {
   department: string;
   specialization: string;
   status?: string;
-}) => {
+};
+
+export const createDoctor = async (data: DoctorInput) => {
   return prisma.doctor.create({ data });
 };
 
 export const getAllDoctors = async () => {
-  return prisma.doctor.findMany({ 
-    orderBy: { createdAt: "desc" } 
-  });
+  return prisma.doctor.findMany({ orderBy: { createdAt: "desc" } });
 };
 
 export const getDoctorById = async (id: number) => {
@@ -30,29 +30,14 @@ export const getDoctorByRegistration = async (registrationNo: string) => {
 };
 
 export const getDoctorsByDepartment = async (department: string) => {
-  return prisma.doctor.findMany({ 
+  return prisma.doctor.findMany({
     where: { department },
-    orderBy: { fullName: "asc" }
+    orderBy: { fullName: "asc" },
   });
 };
 
-export const updateDoctor = async (
-  id: number,
-  data: {
-    fullName?: string;
-    mobileNumber?: string;
-    registrationNo?: string;
-    qualification?: string;
-    designation?: string;
-    department?: string;
-    specialization?: string;
-    status?: string;
-  }
-) => {
-  return prisma.doctor.update({
-    where: { id },
-    data,
-  });
+export const updateDoctor = async (id: number, data: Partial<DoctorInput>) => {
+  return prisma.doctor.update({ where: { id }, data });
 };
 
 export const deleteDoctor = async (id: number) => {

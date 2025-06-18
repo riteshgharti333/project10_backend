@@ -14,7 +14,7 @@ router.route("/").post(createAdmission).get(getAllAdmissions);
 router
   .route("/:id")
   .get(getAdmissionById)
-  .patch(updateAdmission)
+  .put(updateAdmission)
   .delete(deleteAdmission);
 
 export default router;

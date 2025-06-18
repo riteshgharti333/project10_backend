@@ -13,22 +13,20 @@ import {
   updateBed,
   deleteBed,
 } from "../services/bedService";
-
-const bedSchema = z.object({
-  bedNumber: z.string().min(1, "Bed number is required"),
-  wardNumber: z.string().min(1, "Ward number is required"),
-  status: z.enum(["Available", "Occupied", "Maintenance"]).default("Available"),
-  description: z.string().optional(),
-});
+import { bedSchema } from "@hospital/schemas";
 
 export const createBedRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const validated = bedSchema.parse(req.body);
 
-    // Check if bed number already exists
     const existingBed = await getBedByNumber(validated.bedNumber);
     if (existingBed) {
-      return next(new ErrorHandler("Bed with this number already exists", StatusCodes.CONFLICT));
+      return next(
+        new ErrorHandler(
+          "Bed with this number already exists",
+          StatusCodes.CONFLICT
+        )
+      );
     }
 
     const bed = await createBed(validated);
@@ -41,23 +39,25 @@ export const createBedRecord = catchAsyncError(
   }
 );
 
-export const getAllBedRecords = catchAsyncError(async (req: Request, res: Response) => {
-  // Optional ward filter
-  const wardNumber = req.query.ward as string | undefined;
-  
-  const beds = wardNumber 
-    ? await getBedsByWard(wardNumber)
-    : await getAllBeds();
-    
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: wardNumber 
-      ? `Beds in ward ${wardNumber} fetched` 
-      : "All beds fetched",
-    data: beds,
-  });
-});
+export const getAllBedRecords = catchAsyncError(
+  async (req: Request, res: Response) => {
+    // Optional ward filter
+    const wardNumber = req.query.ward as string | undefined;
+
+    const beds = wardNumber
+      ? await getBedsByWard(wardNumber)
+      : await getAllBeds();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: wardNumber
+        ? `Beds in ward ${wardNumber} fetched`
+        : "All beds fetched",
+      data: beds,
+    });
+  }
+);
 
 export const getBedRecordById = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -94,7 +94,12 @@ export const updateBedRecord = catchAsyncError(
     if (validatedData.bedNumber) {
       const existingBed = await getBedByNumber(validatedData.bedNumber);
       if (existingBed && existingBed.id !== id) {
-        return next(new ErrorHandler("Another bed with this number already exists", StatusCodes.CONFLICT));
+        return next(
+          new ErrorHandler(
+            "Another bed with this number already exists",
+            StatusCodes.CONFLICT
+          )
+        );
       }
     }
 

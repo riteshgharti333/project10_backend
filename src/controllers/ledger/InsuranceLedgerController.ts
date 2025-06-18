@@ -13,18 +13,7 @@ import {
   deleteInsuranceLedgerEntry,
 } from "../../services/ledgerService/insuranceLedgerService";
 
-const insuranceLedgerSchema = z.object({
-  patientName: z.string().min(1, "Patient name is required"),
-  tpaInsuranceCompany: z.string().min(1, "TPA/Insurance Company is required"),
-  claimAmount: z.number().positive("Claim amount must be positive"),
-  approvedAmount: z.number().min(0).optional(),
-  settledAmount: z.number().min(0).optional(),
-  status: z.enum(["Pending", "Approved", "Rejected", "Partially Approved", "Settled"]),
-  remarks: z.string().optional(),
-  claimDate: z.coerce.date(),
-  approvalDate: z.coerce.date().optional(),
-  settlementDate: z.coerce.date().optional(),
-});
+import { insuranceLedgerSchema } from "@hospital/schemas";
 
 export const createInsuranceLedgerRecord = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
