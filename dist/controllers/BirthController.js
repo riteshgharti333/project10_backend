@@ -1,27 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBirthRecord = exports.updateBirthRecord = exports.getBirthRecordById = exports.getAllBirthRecords = exports.createBirthRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const birthService_1 = require("../services/birthService");
-const birthSchema = zod_1.z.object({
-    birthTime: zod_1.z.string().min(1, "Birth time is required"),
-    birthDate: zod_1.z.coerce.date(),
-    babySex: zod_1.z.string().min(1, "Baby's sex is required"),
-    babyWeightKg: zod_1.z.number().positive("Weight must be positive"),
-    fathersName: zod_1.z.string().min(1, "Father's name is required"),
-    mothersName: zod_1.z.string().min(1, "Mother's name is required"),
-    mobileNumber: zod_1.z.string().min(10, "Mobile number must be at least 10 digits"),
-    deliveryType: zod_1.z.string().min(1, "Delivery type is required"),
-    placeOfBirth: zod_1.z.string().min(1, "Place of birth is required"),
-    attendantsName: zod_1.z.string().min(1, "Attendant's name is required"),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createBirthRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
     try {
-        const validated = birthSchema.parse(req.body);
+        const validated = schemas_1.birthSchema.parse(req.body);
         const birth = await (0, birthService_1.createBirth)(validated);
         (0, sendResponse_1.sendResponse)(res, {
             success: true,
@@ -61,7 +49,7 @@ exports.updateBirthRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, r
     const id = Number(req.params.id);
     if (isNaN(id))
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
-    const partialSchema = birthSchema.partial();
+    const partialSchema = schemas_1.birthSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     const updatedBirth = await (0, birthService_1.updateBirth)(id, validatedData);
     if (!updatedBirth)

@@ -1,20 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAppointmentRecord = exports.updateAppointmentRecord = exports.getAppointmentRecordById = exports.getAllAppointmentRecords = exports.createAppointmentRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const appointmentService_1 = require("../services/appointmentService");
-const appointmentSchema = zod_1.z.object({
-    appointmentDate: zod_1.z.coerce.date(),
-    doctorName: zod_1.z.string().min(1, "Doctor name is required"),
-    department: zod_1.z.string().min(1, "Department is required"),
-    appointmentTime: zod_1.z.string().min(1, "Appointment time is required"),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createAppointmentRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res) => {
-    const validated = appointmentSchema.parse({
+    const validated = schemas_1.appointmentSchema.parse({
         ...req.body,
         appointmentDate: new Date(req.body.appointmentDate)
     });
@@ -56,7 +50,7 @@ exports.updateAppointmentRecord = (0, catchAsyncError_1.catchAsyncError)(async (
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = appointmentSchema.partial();
+    const partialSchema = schemas_1.appointmentSchema.partial();
     const validatedData = partialSchema.parse({
         ...req.body,
         appointmentDate: req.body.appointmentDate ? new Date(req.body.appointmentDate) : undefined

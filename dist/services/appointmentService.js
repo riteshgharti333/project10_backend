@@ -9,7 +9,7 @@ const createAppointment = async (data) => {
 exports.createAppointment = createAppointment;
 const getAllAppointments = async () => {
     return prisma.appointment.findMany({
-        orderBy: { appointmentDate: 'asc' }
+        orderBy: { appointmentDate: "asc" },
     });
 };
 exports.getAllAppointments = getAllAppointments;

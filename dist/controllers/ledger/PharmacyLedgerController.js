@@ -1,24 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePharmacyLedgerRecord = exports.updatePharmacyLedgerRecord = exports.getPharmacyCategorySummary = exports.getPharmacyFinancialSummary = exports.getPharmacyLedgerRecordById = exports.getAllPharmacyLedgerRecords = exports.createPharmacyLedgerRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../../middlewares/catchAsyncError");
 const errorHandler_1 = require("../../middlewares/errorHandler");
 const sendResponse_1 = require("../../utils/sendResponse");
 const statusCodes_1 = require("../../constants/statusCodes");
 const pharmacyLedgerService_1 = require("../../services/ledgerService/pharmacyLedgerService");
-const pharmacyLedgerSchema = zod_1.z.object({
-    date: zod_1.z.coerce.date(),
-    medicineName: zod_1.z.string().min(1, "Medicine name is required"),
-    category: zod_1.z.string().min(1, "Category is required"),
-    description: zod_1.z.string().min(1, "Description is required"),
-    amountType: zod_1.z.enum(["Income", "Expense"]),
-    amount: zod_1.z.number().positive("Amount must be positive"),
-    paymentMode: zod_1.z.string().min(1, "Payment mode is required"),
-    remarks: zod_1.z.string().optional(),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createPharmacyLedgerRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = pharmacyLedgerSchema.parse({
+    const validated = schemas_1.pharmacyLedgerSchema.parse({
         ...req.body,
         date: new Date(req.body.date),
     });
@@ -89,7 +79,7 @@ exports.updatePharmacyLedgerRecord = (0, catchAsyncError_1.catchAsyncError)(asyn
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = pharmacyLedgerSchema.partial();
+    const partialSchema = schemas_1.pharmacyLedgerSchema.partial();
     const validatedData = partialSchema.parse({
         ...req.body,
         date: req.body.date ? new Date(req.body.date) : undefined,

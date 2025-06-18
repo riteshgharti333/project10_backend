@@ -7,23 +7,26 @@ const createMoneyReceipt = async (data) => {
     return prisma.moneyReceipt.create({ data });
 };
 exports.createMoneyReceipt = createMoneyReceipt;
-const getAllMoneyReceipts = async (searchParams) => {
-    const whereClause = {};
-    if (searchParams.mobile) {
-        whereClause.mobile = { contains: searchParams.mobile };
+const getAllMoneyReceipts = async (filters) => {
+    const where = {};
+    if (filters?.mobile) {
+        where.mobile = { contains: filters.mobile };
     }
-    if (searchParams.patientName) {
-        whereClause.patientName = { contains: searchParams.patientName, mode: 'insensitive' };
+    if (filters?.patientName) {
+        where.patientName = {
+            contains: filters.patientName,
+            mode: "insensitive",
+        };
     }
-    if (searchParams.amount) {
-        whereClause.amount = searchParams.amount;
+    if (filters?.amount) {
+        where.amount = filters.amount;
     }
-    if (searchParams.paymentMode) {
-        whereClause.paymentMode = searchParams.paymentMode;
+    if (filters?.paymentMode) {
+        where.paymentMode = filters.paymentMode;
     }
     return prisma.moneyReceipt.findMany({
-        where: whereClause,
-        orderBy: { date: "desc" }
+        where,
+        orderBy: { date: "desc" },
     });
 };
 exports.getAllMoneyReceipts = getAllMoneyReceipts;
@@ -36,10 +39,10 @@ const getMoneyReceiptsByDateRange = async (startDate, endDate) => {
         where: {
             date: {
                 gte: startDate,
-                lte: endDate
-            }
+                lte: endDate,
+            },
         },
-        orderBy: { date: "desc" }
+        orderBy: { date: "desc" },
     });
 };
 exports.getMoneyReceiptsByDateRange = getMoneyReceiptsByDateRange;

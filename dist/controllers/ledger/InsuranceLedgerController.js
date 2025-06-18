@@ -1,26 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteInsuranceLedgerRecord = exports.updateInsuranceLedgerRecord = exports.getInsuranceSummaryReport = exports.getInsuranceLedgerRecordById = exports.getAllInsuranceLedgerRecords = exports.createInsuranceLedgerRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../../middlewares/catchAsyncError");
 const errorHandler_1 = require("../../middlewares/errorHandler");
 const sendResponse_1 = require("../../utils/sendResponse");
 const statusCodes_1 = require("../../constants/statusCodes");
 const insuranceLedgerService_1 = require("../../services/ledgerService/insuranceLedgerService");
-const insuranceLedgerSchema = zod_1.z.object({
-    patientName: zod_1.z.string().min(1, "Patient name is required"),
-    tpaInsuranceCompany: zod_1.z.string().min(1, "TPA/Insurance Company is required"),
-    claimAmount: zod_1.z.number().positive("Claim amount must be positive"),
-    approvedAmount: zod_1.z.number().min(0).optional(),
-    settledAmount: zod_1.z.number().min(0).optional(),
-    status: zod_1.z.enum(["Pending", "Approved", "Rejected", "Partially Approved", "Settled"]),
-    remarks: zod_1.z.string().optional(),
-    claimDate: zod_1.z.coerce.date(),
-    approvalDate: zod_1.z.coerce.date().optional(),
-    settlementDate: zod_1.z.coerce.date().optional(),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createInsuranceLedgerRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = insuranceLedgerSchema.parse({
+    const validated = schemas_1.insuranceLedgerSchema.parse({
         ...req.body,
         claimDate: new Date(req.body.claimDate),
         approvalDate: req.body.approvalDate ? new Date(req.body.approvalDate) : undefined,
@@ -80,7 +68,7 @@ exports.updateInsuranceLedgerRecord = (0, catchAsyncError_1.catchAsyncError)(asy
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = insuranceLedgerSchema.partial();
+    const partialSchema = schemas_1.insuranceLedgerSchema.partial();
     const validatedData = partialSchema.parse({
         ...req.body,
         claimDate: req.body.claimDate ? new Date(req.body.claimDate) : undefined,

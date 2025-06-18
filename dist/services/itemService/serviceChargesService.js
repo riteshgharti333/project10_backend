@@ -9,7 +9,7 @@ const createServiceCharge = async (data) => {
 exports.createServiceCharge = createServiceCharge;
 const getAllServiceCharges = async () => {
     return prisma.serviceCharge.findMany({
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
     });
 };
 exports.getAllServiceCharges = getAllServiceCharges;
@@ -20,7 +20,7 @@ exports.getServiceChargeById = getServiceChargeById;
 const getServiceChargesByCategory = async (category) => {
     return prisma.serviceCharge.findMany({
         where: { category },
-        orderBy: { serviceName: "asc" }
+        orderBy: { serviceName: "asc" },
     });
 };
 exports.getServiceChargesByCategory = getServiceChargesByCategory;

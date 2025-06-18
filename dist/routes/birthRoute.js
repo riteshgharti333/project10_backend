@@ -11,6 +11,6 @@ router.route("/")
     .get(BirthController_1.getAllBirthRecords);
 router.route("/:id")
     .get(BirthController_1.getBirthRecordById)
-    .patch(BirthController_1.updateBirthRecord)
+    .put(BirthController_1.updateBirthRecord)
     .delete(BirthController_1.deleteBirthRecord);
 exports.default = router;

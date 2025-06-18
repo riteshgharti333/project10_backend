@@ -1,24 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePatientRecord = exports.updatePatientRecord = exports.getPatientRecordById = exports.getAllPatientRecords = exports.createPatientRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const patientService_1 = require("../services/patientService");
-const patientSchema = zod_1.z.object({
-    fullName: zod_1.z.string().min(1, "Full name is required"),
-    age: zod_1.z.number().int().positive("Age must be positive"),
-    mobileNumber: zod_1.z.string().min(10, "Mobile number must be 10 digits"),
-    gender: zod_1.z.string().min(1, "Gender is required"),
-    bedNumber: zod_1.z.string().min(1, "Bed number is required"),
-    aadhaarNumber: zod_1.z.string().length(12, "Aadhaar must be 12 digits"),
-    address: zod_1.z.string().min(1, "Address is required"),
-    medicalHistory: zod_1.z.string().min(1, "Medical history is required"),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createPatientRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = patientSchema.parse(req.body);
+    const validated = schemas_1.patientSchema.parse(req.body);
     const patient = await (0, patientService_1.createPatient)(validated);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
@@ -57,7 +47,7 @@ exports.updatePatientRecord = (0, catchAsyncError_1.catchAsyncError)(async (req,
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = patientSchema.partial();
+    const partialSchema = schemas_1.patientSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     // Check if updating Aadhaar to an existing one
     if (validatedData.aadhaarNumber) {

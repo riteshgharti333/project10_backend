@@ -10,6 +10,6 @@ router.route("/").post(AdmissionController_1.createAdmission).get(AdmissionContr
 router
     .route("/:id")
     .get(AdmissionController_1.getAdmissionById)
-    .patch(AdmissionController_1.updateAdmission)
+    .put(AdmissionController_1.updateAdmission)
     .delete(AdmissionController_1.deleteAdmission);
 exports.default = router;

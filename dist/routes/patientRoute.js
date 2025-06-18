@@ -11,6 +11,6 @@ router.route("/")
     .get(PatientController_1.getAllPatientRecords);
 router.route("/:id")
     .get(PatientController_1.getPatientRecordById)
-    .patch(PatientController_1.updatePatientRecord)
+    .put(PatientController_1.updatePatientRecord)
     .delete(PatientController_1.deletePatientRecord);
 exports.default = router;

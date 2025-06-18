@@ -1,24 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteDiagnosticsRecord = exports.updateDiagnosticsRecord = exports.getPatientDiagnosticsTotalRecord = exports.getDiagnosticsRecordById = exports.getAllDiagnosticsRecords = exports.createDiagnosticsRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../../middlewares/catchAsyncError");
 const errorHandler_1 = require("../../middlewares/errorHandler");
 const sendResponse_1 = require("../../utils/sendResponse");
 const statusCodes_1 = require("../../constants/statusCodes");
 const diagnosticsLedgerService_1 = require("../../services/ledgerService/diagnosticsLedgerService");
-const diagnosticsSchema = zod_1.z.object({
-    patientName: zod_1.z.string().min(1, "Patient name is required"),
-    date: zod_1.z.coerce.date(),
-    testName: zod_1.z.string().min(1, "Test name is required"),
-    description: zod_1.z.string().min(1, "Description is required"),
-    amount: zod_1.z.number().positive("Amount must be positive"),
-    paymentMode: zod_1.z.string().min(1, "Payment mode is required"),
-    attachReport: zod_1.z.string().optional(),
-    remarks: zod_1.z.string().optional(),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createDiagnosticsRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = diagnosticsSchema.parse({
+    const validated = schemas_1.diagnosticsLedgerSchema.parse({
         ...req.body,
         date: new Date(req.body.date)
     });
@@ -79,7 +69,7 @@ exports.updateDiagnosticsRecord = (0, catchAsyncError_1.catchAsyncError)(async (
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = diagnosticsSchema.partial();
+    const partialSchema = schemas_1.diagnosticsLedgerSchema.partial();
     const validatedData = partialSchema.parse({
         ...req.body,
         date: req.body.date ? new Date(req.body.date) : undefined

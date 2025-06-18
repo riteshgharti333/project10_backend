@@ -1,22 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAmbulanceRecord = exports.updateAmbulanceRecord = exports.getAmbulanceRecordById = exports.getAllAmbulanceRecords = exports.createAmbulanceRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const ambulanceService_1 = require("../services/ambulanceService");
-const ambulanceSchema = zod_1.z.object({
-    modelName: zod_1.z.string().min(1, "Model name is required"),
-    brand: zod_1.z.string().min(1, "Brand is required"),
-    registrationNo: zod_1.z.string().min(1, "Registration number is required"),
-    driverName: zod_1.z.string().min(1, "Driver name is required"),
-    driverContact: zod_1.z.string().min(10, "Driver contact must be at least 10 digits"),
-    status: zod_1.z.enum(["Available", "On-Call", "Maintenance"]).default("Available"),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createAmbulanceRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = ambulanceSchema.parse(req.body);
+    const validated = schemas_1.ambulanceSchema.parse(req.body);
     // Check if registration number already exists
     const existingAmbulance = await (0, ambulanceService_1.getAmbulanceByRegistration)(validated.registrationNo);
     if (existingAmbulance) {
@@ -63,7 +55,7 @@ exports.updateAmbulanceRecord = (0, catchAsyncError_1.catchAsyncError)(async (re
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = ambulanceSchema.partial();
+    const partialSchema = schemas_1.ambulanceSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     // Check if updating registration number to an existing one
     if (validatedData.registrationNo) {

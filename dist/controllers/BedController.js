@@ -1,21 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBedRecord = exports.updateBedRecord = exports.getBedRecordById = exports.getAllBedRecords = exports.createBedRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const bedService_1 = require("../services/bedService");
-const bedSchema = zod_1.z.object({
-    bedNumber: zod_1.z.string().min(1, "Bed number is required"),
-    wardNumber: zod_1.z.string().min(1, "Ward number is required"),
-    status: zod_1.z.enum(["Available", "Occupied", "Maintenance"]).default("Available"),
-    description: zod_1.z.string().optional(),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createBedRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = bedSchema.parse(req.body);
-    // Check if bed number already exists
+    const validated = schemas_1.bedSchema.parse(req.body);
     const existingBed = await (0, bedService_1.getBedByNumber)(validated.bedNumber);
     if (existingBed) {
         return next(new errorHandler_1.ErrorHandler("Bed with this number already exists", statusCodes_1.StatusCodes.CONFLICT));
@@ -64,7 +57,7 @@ exports.updateBedRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = bedSchema.partial();
+    const partialSchema = schemas_1.bedSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     // Check if updating bed number to an existing one
     if (validatedData.bedNumber) {

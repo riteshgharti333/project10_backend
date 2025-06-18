@@ -9,7 +9,7 @@ const createVoucher = async (data) => {
 exports.createVoucher = createVoucher;
 const getAllVouchers = async () => {
     return prisma.voucher.findMany({
-        orderBy: { voucherDate: "desc" }
+        orderBy: { voucherDate: "desc" },
     });
 };
 exports.getAllVouchers = getAllVouchers;
@@ -20,7 +20,7 @@ exports.getVoucherById = getVoucherById;
 const getVouchersByVendor = async (vendorName) => {
     return prisma.voucher.findMany({
         where: { vendorName },
-        orderBy: { voucherDate: "desc" }
+        orderBy: { voucherDate: "desc" },
     });
 };
 exports.getVouchersByVendor = getVouchersByVendor;
@@ -29,10 +29,10 @@ const getVouchersByDateRange = async (startDate, endDate) => {
         where: {
             voucherDate: {
                 gte: startDate,
-                lte: endDate
-            }
+                lte: endDate,
+            },
         },
-        orderBy: { voucherDate: "desc" }
+        orderBy: { voucherDate: "desc" },
     });
 };
 exports.getVouchersByDateRange = getVouchersByDateRange;

@@ -11,7 +11,7 @@ const getAllAmbulances = async (status) => {
     const where = status ? { status } : {};
     return prisma.ambulance.findMany({
         where,
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
     });
 };
 exports.getAllAmbulances = getAllAmbulances;
@@ -24,10 +24,7 @@ const getAmbulanceByRegistration = async (registrationNo) => {
 };
 exports.getAmbulanceByRegistration = getAmbulanceByRegistration;
 const updateAmbulance = async (id, data) => {
-    return prisma.ambulance.update({
-        where: { id },
-        data,
-    });
+    return prisma.ambulance.update({ where: { id }, data });
 };
 exports.updateAmbulance = updateAmbulance;
 const deleteAmbulance = async (id) => {

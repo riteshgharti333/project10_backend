@@ -1,26 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProductRecord = exports.updateProductRecord = exports.getProductRecordById = exports.getAllProductRecords = exports.createProductRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../../middlewares/catchAsyncError");
 const errorHandler_1 = require("../../middlewares/errorHandler");
 const sendResponse_1 = require("../../utils/sendResponse");
 const statusCodes_1 = require("../../constants/statusCodes");
 const productService_1 = require("../../services/itemService/productService");
-const productSchema = zod_1.z.object({
-    productName: zod_1.z.string().min(1, "Product name is required"),
-    productCode: zod_1.z.string().min(1, "Product code is required"),
-    parentCategory: zod_1.z.string().min(1, "Parent category is required"),
-    subCategory: zod_1.z.string().min(1, "Sub category is required"),
-    categoryLogo: zod_1.z.string().optional(),
-    description: zod_1.z.string().optional(),
-    unit: zod_1.z.string().min(1, "Unit is required"),
-    price: zod_1.z.number().min(0, "Price must be positive"),
-    taxRate: zod_1.z.number().min(0, "Tax rate must be positive"),
-    status: zod_1.z.string().optional().default("Active"),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createProductRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = productSchema.parse(req.body);
+    const validated = schemas_1.productSchema.parse(req.body);
     // Check if product code already exists
     const existingProduct = await (0, productService_1.getProductByCode)(validated.productCode);
     if (existingProduct) {
@@ -72,7 +60,7 @@ exports.updateProductRecord = (0, catchAsyncError_1.catchAsyncError)(async (req,
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = productSchema.partial();
+    const partialSchema = schemas_1.productSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     // Check if updating product code to an existing one
     if (validatedData.productCode) {

@@ -1,39 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteXrayReportRecord = exports.updateXrayReportRecord = exports.getDoctorWiseSummaryReport = exports.getFinancialSummaryReport = exports.getXrayReportRecordById = exports.getAllXrayReportRecords = exports.createXrayReportRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const xrayService_1 = require("../services/xrayService");
-const xrayReportSchema = zod_1.z.object({
-    billDate: zod_1.z.coerce.date(),
-    patientMobile: zod_1.z.string().min(10, "Valid mobile number required"),
-    patientName: zod_1.z.string().min(1, "Patient name is required"),
-    patientSex: zod_1.z.enum(["Male", "Female", "Other"]),
-    age: zod_1.z.number().int().min(0, "Age must be positive"),
-    referredDoctor: zod_1.z.string().min(1, "Referred doctor is required"),
-    testDate: zod_1.z.coerce.date(),
-    reportDate: zod_1.z.coerce.date(),
-    patientAddress: zod_1.z.string().optional(),
-    examDescription: zod_1.z.string().min(1, "Exam description is required"),
-    department: zod_1.z.string().min(1, "Department is required"),
-    billAmount: zod_1.z.number().positive("Bill amount must be positive"),
-    discountPercent: zod_1.z.number().min(0).max(100, "Discount must be between 0-100%"),
-    netBillAmount: zod_1.z.number().positive("Net amount must be positive"),
-    commissionPercent: zod_1.z.number().min(0).max(100, "Commission must be between 0-100%"),
-    doctorEarning: zod_1.z.number().min(0, "Doctor earning must be positive"),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createXrayReportRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = xrayReportSchema.parse({
+    const validated = schemas_1.xrayReportSchema.parse({
         ...req.body,
         billDate: new Date(req.body.billDate),
         testDate: new Date(req.body.testDate),
-        reportDate: new Date(req.body.reportDate)
+        reportDate: new Date(req.body.reportDate),
     });
     // Validate netBillAmount calculation
-    const calculatedNet = validated.billAmount * (1 - (validated.discountPercent / 100));
+    const calculatedNet = validated.billAmount * (1 - validated.discountPercent / 100);
     if (Math.abs(calculatedNet - validated.netBillAmount) > 0.01) {
         return next(new errorHandler_1.ErrorHandler("Net bill amount calculation doesn't match", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
@@ -55,9 +37,13 @@ exports.getAllXrayReportRecords = (0, catchAsyncError_1.catchAsyncError)(async (
         patientMobile: req.query.patientMobile,
         patientName: req.query.patientName,
         referredDoctor: req.query.referredDoctor,
-        startDate: req.query.startDate ? new Date(req.query.startDate) : undefined,
-        endDate: req.query.endDate ? new Date(req.query.endDate) : undefined,
-        department: req.query.department
+        startDate: req.query.startDate
+            ? new Date(req.query.startDate)
+            : undefined,
+        endDate: req.query.endDate
+            ? new Date(req.query.endDate)
+            : undefined,
+        department: req.query.department,
     };
     const reports = await (0, xrayService_1.getAllXrayReports)(filters);
     (0, sendResponse_1.sendResponse)(res, {
@@ -106,12 +92,14 @@ exports.updateXrayReportRecord = (0, catchAsyncError_1.catchAsyncError)(async (r
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = xrayReportSchema.partial();
+    const partialSchema = schemas_1.xrayReportSchema.partial();
     const validatedData = partialSchema.parse({
         ...req.body,
         billDate: req.body.billDate ? new Date(req.body.billDate) : undefined,
         testDate: req.body.testDate ? new Date(req.body.testDate) : undefined,
-        reportDate: req.body.reportDate ? new Date(req.body.reportDate) : undefined
+        reportDate: req.body.reportDate
+            ? new Date(req.body.reportDate)
+            : undefined,
     });
     const updatedReport = await (0, xrayService_1.updateXrayReport)(id, validatedData);
     if (!updatedReport) {

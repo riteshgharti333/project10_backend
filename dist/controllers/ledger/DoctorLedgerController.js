@@ -1,24 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteDoctorLedgerRecord = exports.updateDoctorLedgerRecord = exports.getDoctorBalanceRecord = exports.getDoctorLedgerRecordById = exports.getAllDoctorLedgerRecords = exports.createDoctorLedgerRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../../middlewares/catchAsyncError");
 const errorHandler_1 = require("../../middlewares/errorHandler");
 const sendResponse_1 = require("../../utils/sendResponse");
 const statusCodes_1 = require("../../constants/statusCodes");
 const doctorLedgerService_1 = require("../../services/ledgerService/doctorLedgerService");
-const doctorLedgerSchema = zod_1.z.object({
-    doctorName: zod_1.z.string().min(1, "Doctor name is required"),
-    date: zod_1.z.coerce.date(),
-    description: zod_1.z.string().min(1, "Description is required"),
-    amountType: zod_1.z.enum(["Credit", "Debit"]),
-    amount: zod_1.z.number().positive("Amount must be positive"),
-    paymentMode: zod_1.z.string().min(1, "Payment mode is required"),
-    transactionId: zod_1.z.string().optional(),
-    remarks: zod_1.z.string().optional(),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createDoctorLedgerRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = doctorLedgerSchema.parse({
+    const validated = schemas_1.doctorLedgerSchema.parse({
         ...req.body,
         date: new Date(req.body.date)
     });
@@ -79,7 +69,7 @@ exports.updateDoctorLedgerRecord = (0, catchAsyncError_1.catchAsyncError)(async 
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = doctorLedgerSchema.partial();
+    const partialSchema = schemas_1.doctorLedgerSchema.partial();
     const validatedData = partialSchema.parse({
         ...req.body,
         date: req.body.date ? new Date(req.body.date) : undefined

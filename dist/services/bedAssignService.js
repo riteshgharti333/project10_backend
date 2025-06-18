@@ -8,9 +8,7 @@ const createBedAssignment = async (data) => {
 };
 exports.createBedAssignment = createBedAssignment;
 const getAllBedAssignments = async () => {
-    return prisma.bedAssignment.findMany({
-        orderBy: { allocateDate: "desc" }
-    });
+    return prisma.bedAssignment.findMany({ orderBy: { allocateDate: "desc" } });
 };
 exports.getAllBedAssignments = getAllBedAssignments;
 const getBedAssignmentById = async (id) => {
@@ -20,21 +18,21 @@ exports.getBedAssignmentById = getBedAssignmentById;
 const getAssignmentsByBed = async (bedNumber) => {
     return prisma.bedAssignment.findMany({
         where: { bedNumber },
-        orderBy: { allocateDate: "desc" }
+        orderBy: { allocateDate: "desc" },
     });
 };
 exports.getAssignmentsByBed = getAssignmentsByBed;
 const getAssignmentsByWard = async (wardNumber) => {
     return prisma.bedAssignment.findMany({
         where: { wardNumber },
-        orderBy: { allocateDate: "desc" }
+        orderBy: { allocateDate: "desc" },
     });
 };
 exports.getAssignmentsByWard = getAssignmentsByWard;
 const getActiveAssignments = async () => {
     return prisma.bedAssignment.findMany({
         where: { status: "Active" },
-        orderBy: { allocateDate: "desc" }
+        orderBy: { allocateDate: "desc" },
     });
 };
 exports.getActiveAssignments = getActiveAssignments;
@@ -50,7 +48,7 @@ const dischargePatient = async (id, dischargeDate) => {
         where: { id },
         data: {
             status: "Discharged",
-            dischargeDate
+            dischargeDate,
         },
     });
 };

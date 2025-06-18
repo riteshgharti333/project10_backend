@@ -1,35 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBillRecord = exports.updateBillRecord = exports.getBillRecordById = exports.getAllBillRecords = exports.createBillRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../../middlewares/catchAsyncError");
 const errorHandler_1 = require("../../middlewares/errorHandler");
 const sendResponse_1 = require("../../utils/sendResponse");
 const statusCodes_1 = require("../../constants/statusCodes");
 const billService_1 = require("../../services/transectionService/billService");
-const billItemSchema = zod_1.z.object({
-    company: zod_1.z.string().min(1, "Company is required"),
-    itemOrService: zod_1.z.string().min(1, "Item/Service is required"),
-    quantity: zod_1.z.number().min(1, "Quantity must be at least 1"),
-});
-const billSchema = zod_1.z.object({
-    billDate: zod_1.z.string().transform((val) => new Date(val)),
-    billType: zod_1.z.string().min(1, "Bill type is required"),
-    mobile: zod_1.z.string().min(10, "Mobile must be at least 10 digits"),
-    admissionNo: zod_1.z.string().min(1, "Admission number is required"),
-    admissionDate: zod_1.z.string().transform((val) => new Date(val)),
-    dateOfBirth: zod_1.z.string().transform((val) => new Date(val)),
-    gender: zod_1.z.enum(["Male", "Female", "Other"]),
-    dischargeDate: zod_1.z.string().transform((val) => new Date(val)).optional(),
-    address: zod_1.z.string().min(1, "Address is required"),
-    doctorName: zod_1.z.string().min(1, "Doctor name is required"),
-    wardNo: zod_1.z.string().min(1, "Ward number is required"),
-    bedNo: zod_1.z.string().min(1, "Bed number is required"),
-    status: zod_1.z.string().optional().default("Pending"),
-    billItems: zod_1.z.array(billItemSchema).min(1, "At least one bill item is required"),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createBillRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = billSchema.parse(req.body);
+    const validated = schemas_1.billSchema.parse(req.body);
     const bill = await (0, billService_1.createBill)(validated);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
@@ -73,7 +52,7 @@ exports.updateBillRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, re
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = billSchema.partial();
+    const partialSchema = schemas_1.billSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     const updatedBill = await (0, billService_1.updateBill)(id, validatedData);
     if (!updatedBill) {

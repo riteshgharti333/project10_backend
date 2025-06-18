@@ -11,6 +11,6 @@ router.route("/")
     .get(DepartmentController_1.getAllDepartmentRecords);
 router.route("/:id")
     .get(DepartmentController_1.getDepartmentRecordById)
-    .patch(DepartmentController_1.updateDepartmentRecord)
+    .put(DepartmentController_1.updateDepartmentRecord)
     .delete(DepartmentController_1.deleteDepartmentRecord);
 exports.default = router;

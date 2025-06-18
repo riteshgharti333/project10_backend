@@ -1,22 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePharmacistRecord = exports.updatePharmacistRecord = exports.getPharmacistRecordById = exports.getAllPharmacistRecords = exports.createPharmacistRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const pharmacistService_1 = require("../services/pharmacistService");
-const pharmacistSchema = zod_1.z.object({
-    fullName: zod_1.z.string().min(1, "Full name is required"),
-    mobileNumber: zod_1.z.string().min(10, "Mobile number must be at least 10 digits"),
-    registrationNo: zod_1.z.string().min(1, "Registration number is required"),
-    address: zod_1.z.string().min(1, "Address is required"),
-    department: zod_1.z.string().min(1, "Department is required"),
-    status: zod_1.z.string().optional().default("Active"),
-});
+const schemas_1 = require("@hospital/schemas");
+// import {medicineSchema} from "@hospital/schemas"
 exports.createPharmacistRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = pharmacistSchema.parse(req.body);
+    const validated = schemas_1.pharmacistSchema.parse(req.body);
     // Check if registration number already exists
     const existingPharmacist = await (0, pharmacistService_1.getPharmacistByRegistration)(validated.registrationNo);
     if (existingPharmacist) {
@@ -65,7 +58,7 @@ exports.updatePharmacistRecord = (0, catchAsyncError_1.catchAsyncError)(async (r
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = pharmacistSchema.partial();
+    const partialSchema = schemas_1.pharmacistSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     // Check if updating registration number to an existing one
     if (validatedData.registrationNo) {

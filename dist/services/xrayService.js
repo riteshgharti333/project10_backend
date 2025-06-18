@@ -9,15 +9,14 @@ const createXrayReport = async (data) => {
 exports.createXrayReport = createXrayReport;
 const getAllXrayReports = async (filters) => {
     const where = {};
-    if (filters.patientMobile) {
+    if (filters.patientMobile)
         where.patientMobile = filters.patientMobile;
-    }
-    if (filters.patientName) {
+    if (filters.patientName)
         where.patientName = filters.patientName;
-    }
-    if (filters.referredDoctor) {
+    if (filters.referredDoctor)
         where.referredDoctor = filters.referredDoctor;
-    }
+    if (filters.department)
+        where.department = filters.department;
     if (filters.startDate || filters.endDate) {
         where.billDate = {};
         if (filters.startDate)
@@ -25,12 +24,9 @@ const getAllXrayReports = async (filters) => {
         if (filters.endDate)
             where.billDate.lte = filters.endDate;
     }
-    if (filters.department) {
-        where.department = filters.department;
-    }
     return prisma.xrayReport.findMany({
         where,
-        orderBy: { billDate: 'desc' }
+        orderBy: { billDate: "desc" }
     });
 };
 exports.getAllXrayReports = getAllXrayReports;
@@ -39,15 +35,11 @@ const getXrayReportById = async (id) => {
 };
 exports.getXrayReportById = getXrayReportById;
 const getFinancialSummary = async () => {
-    const totalBillAmount = await prisma.xrayReport.aggregate({
-        _sum: { billAmount: true }
-    });
-    const totalNetAmount = await prisma.xrayReport.aggregate({
-        _sum: { netBillAmount: true }
-    });
-    const totalDoctorEarning = await prisma.xrayReport.aggregate({
-        _sum: { doctorEarning: true }
-    });
+    const [totalBillAmount, totalNetAmount, totalDoctorEarning] = await Promise.all([
+        prisma.xrayReport.aggregate({ _sum: { billAmount: true } }),
+        prisma.xrayReport.aggregate({ _sum: { netBillAmount: true } }),
+        prisma.xrayReport.aggregate({ _sum: { doctorEarning: true } })
+    ]);
     return {
         totalBillAmount: totalBillAmount._sum.billAmount || 0,
         totalNetAmount: totalNetAmount._sum.netBillAmount || 0,
@@ -57,14 +49,14 @@ const getFinancialSummary = async () => {
 exports.getFinancialSummary = getFinancialSummary;
 const getDoctorWiseSummary = async () => {
     return prisma.xrayReport.groupBy({
-        by: ['referredDoctor'],
+        by: ["referredDoctor"],
         _sum: {
             doctorEarning: true,
             netBillAmount: true
         },
         orderBy: {
             _sum: {
-                doctorEarning: 'desc'
+                doctorEarning: "desc"
             }
         }
     });
@@ -73,7 +65,7 @@ exports.getDoctorWiseSummary = getDoctorWiseSummary;
 const updateXrayReport = async (id, data) => {
     return prisma.xrayReport.update({
         where: { id },
-        data,
+        data
     });
 };
 exports.updateXrayReport = updateXrayReport;

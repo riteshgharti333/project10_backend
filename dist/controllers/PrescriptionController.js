@@ -1,37 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePrescriptionRecord = exports.updatePrescriptionRecord = exports.getPrescriptionRecordById = exports.getAllPrescriptionRecords = exports.createPrescriptionRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../middlewares/catchAsyncError");
 const errorHandler_1 = require("../middlewares/errorHandler");
 const sendResponse_1 = require("../utils/sendResponse");
 const statusCodes_1 = require("../constants/statusCodes");
 const prescriptionService_1 = require("../services/prescriptionService");
-const medicineSchema = zod_1.z.object({
-    medicineName: zod_1.z.string().min(1, "Medicine name is required"),
-    description: zod_1.z.string().min(1, "Description is required"),
-});
-const prescriptionSchema = zod_1.z.object({
-    prescriptionDate: zod_1.z.coerce.date(),
-    doctorId: zod_1.z.number().min(1, "Doctor ID is required"),
-    patientId: zod_1.z.number().min(1, "Patient ID is required"),
-    prescriptionDoc: zod_1.z.string().optional(),
-    status: zod_1.z.string().optional().default("Active"),
-    medicines: zod_1.z.array(medicineSchema).min(1, "At least one medicine is required"),
-});
-exports.createPrescriptionRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = prescriptionSchema.parse({
-        ...req.body,
-        prescriptionDate: new Date(req.body.prescriptionDate)
-    });
-    const prescription = await (0, prescriptionService_1.createPrescription)(validated);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: statusCodes_1.StatusCodes.CREATED,
-        message: "Prescription created successfully",
-        data: prescription,
-    });
-});
+const schemas_1 = require("@hospital/schemas");
+const createPrescriptionRecord = async (req, res, next) => {
+    try {
+        // ✅ Validate and parse
+        const validated = schemas_1.prescriptionSchema.parse({
+            ...req.body,
+            prescriptionDate: new Date(req.body.prescriptionDate),
+        });
+        // ✅ Create in DB
+        const prescription = await (0, prescriptionService_1.createPrescription)(validated);
+        // ✅ Success response
+        (0, sendResponse_1.sendResponse)(res, {
+            success: true,
+            statusCode: statusCodes_1.StatusCodes.CREATED,
+            message: "Prescription created successfully",
+            data: prescription,
+        });
+    }
+    catch (error) {
+        // ❌ If validation or DB fails, send error
+        console.log(error);
+        next(error); // Forward error to Express error handler middleware
+    }
+};
+exports.createPrescriptionRecord = createPrescriptionRecord;
 exports.getAllPrescriptionRecords = (0, catchAsyncError_1.catchAsyncError)(async (req, res) => {
     const patientId = req.query.patientId ? Number(req.query.patientId) : undefined;
     const prescriptions = patientId
@@ -67,7 +66,7 @@ exports.updatePrescriptionRecord = (0, catchAsyncError_1.catchAsyncError)(async 
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = prescriptionSchema.partial();
+    const partialSchema = schemas_1.prescriptionSchema.partial();
     const validatedData = partialSchema.parse({
         ...req.body,
         prescriptionDate: req.body.prescriptionDate ? new Date(req.body.prescriptionDate) : undefined

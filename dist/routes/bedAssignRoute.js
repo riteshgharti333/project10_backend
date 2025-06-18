@@ -11,7 +11,7 @@ router.route("/")
     .get(BedAssignController_1.getAllBedAssignmentRecords);
 router.route("/:id")
     .get(BedAssignController_1.getBedAssignmentRecordById)
-    .patch(BedAssignController_1.updateBedAssignmentRecord)
+    .put(BedAssignController_1.updateBedAssignmentRecord)
     .delete(BedAssignController_1.deleteBedAssignmentRecord);
 router.post("/:id/discharge", BedAssignController_1.dischargePatientFromBed);
 exports.default = router;

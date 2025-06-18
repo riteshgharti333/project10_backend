@@ -8,9 +8,7 @@ const createDoctor = async (data) => {
 };
 exports.createDoctor = createDoctor;
 const getAllDoctors = async () => {
-    return prisma.doctor.findMany({
-        orderBy: { createdAt: "desc" }
-    });
+    return prisma.doctor.findMany({ orderBy: { createdAt: "desc" } });
 };
 exports.getAllDoctors = getAllDoctors;
 const getDoctorById = async (id) => {
@@ -24,15 +22,12 @@ exports.getDoctorByRegistration = getDoctorByRegistration;
 const getDoctorsByDepartment = async (department) => {
     return prisma.doctor.findMany({
         where: { department },
-        orderBy: { fullName: "asc" }
+        orderBy: { fullName: "asc" },
     });
 };
 exports.getDoctorsByDepartment = getDoctorsByDepartment;
 const updateDoctor = async (id, data) => {
-    return prisma.doctor.update({
-        where: { id },
-        data,
-    });
+    return prisma.doctor.update({ where: { id }, data });
 };
 exports.updateDoctor = updateDoctor;
 const deleteDoctor = async (id) => {

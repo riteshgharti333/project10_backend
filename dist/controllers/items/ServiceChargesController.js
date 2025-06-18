@@ -1,24 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteServiceChargeRecord = exports.updateServiceChargeRecord = exports.getServiceChargeRecordById = exports.getAllServiceChargeRecords = exports.createServiceChargeRecord = void 0;
-const zod_1 = require("zod");
 const catchAsyncError_1 = require("../../middlewares/catchAsyncError");
 const errorHandler_1 = require("../../middlewares/errorHandler");
 const sendResponse_1 = require("../../utils/sendResponse");
 const statusCodes_1 = require("../../constants/statusCodes");
 const serviceChargesService_1 = require("../../services/itemService/serviceChargesService");
-const serviceChargeSchema = zod_1.z.object({
-    serviceName: zod_1.z.string().min(1, "Service name is required"),
-    category: zod_1.z.string().min(1, "Category is required"),
-    chargeType: zod_1.z.string().min(1, "Charge type is required"),
-    baseAmount: zod_1.z.number().min(0, "Base amount must be positive"),
-    taxApplicable: zod_1.z.boolean().default(false),
-    taxPercentage: zod_1.z.number().min(0).max(100).optional(),
-    status: zod_1.z.string().optional().default("Active"),
-    notes: zod_1.z.string().optional(),
-});
+const schemas_1 = require("@hospital/schemas");
 exports.createServiceChargeRecord = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
-    const validated = serviceChargeSchema.parse(req.body);
+    const validated = schemas_1.serviceChargeSchema.parse(req.body);
     const serviceCharge = await (0, serviceChargesService_1.createServiceCharge)(validated);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
@@ -62,7 +52,7 @@ exports.updateServiceChargeRecord = (0, catchAsyncError_1.catchAsyncError)(async
     if (isNaN(id)) {
         return next(new errorHandler_1.ErrorHandler("Invalid ID", statusCodes_1.StatusCodes.BAD_REQUEST));
     }
-    const partialSchema = serviceChargeSchema.partial();
+    const partialSchema = schemas_1.serviceChargeSchema.partial();
     const validatedData = partialSchema.parse(req.body);
     // Validate tax percentage if tax is applicable
     if (validatedData.taxApplicable && !validatedData.taxPercentage) {
